@@ -1,0 +1,1 @@
+"0","text(x + 0.05, y + 0.05, labels = as.character(1:12))"

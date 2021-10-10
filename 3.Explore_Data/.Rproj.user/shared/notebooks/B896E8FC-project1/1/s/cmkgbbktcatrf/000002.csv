@@ -1,0 +1,6 @@
+"0","```r
+# Open a png file
+png(filename = \"plot2.png\",
+    width = 480,
+    height = 480)
+```"

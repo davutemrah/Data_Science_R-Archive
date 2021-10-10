@@ -1,0 +1,95 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+volcano <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-12/volcano.csv")
+
+volcano %>% 
+  select(primary_volcano_type, longitude, 
+         latitude, population_within_100_km)
+```
+
+
+```{r}
+world <- map_data("world")
+
+world
+```
+
+```{r}
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(x = long, y = lat, map_id = region)
+  ) 
+```
+
+```{r}
+g0 <- ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(x = long, y = lat, map_id = region),
+    color = "black", fill = "lightgray", size = 0.1
+  )
+g0
+```
+
+
+```{r}
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = volcano,
+    aes(longitude, latitude, color = primary_volcano_type),
+    alpha = 0.7
+  ) 
+
+```
+
+```{r}
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = volcano,
+    aes(longitude, latitude, color = primary_volcano_type),
+    alpha = 0.7
+  ) +
+  theme_void() +
+  theme(legend.position = "none")
+```
+
+```{r}
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region),
+    color = "white", fill = "lightgray", size = 0.1
+  ) +
+  geom_point(
+    data = volcano,
+    aes(longitude, latitude, 
+        color = primary_volcano_type,
+        size=population_within_100_km),
+    alpha = 0.5
+  ) +
+  #labs(x = NULL, y = NULL, color = NULL)+
+  theme_void() +
+  theme(legend.position = "none")+
+  labs(title="Volcano Locations")
+```
+
+

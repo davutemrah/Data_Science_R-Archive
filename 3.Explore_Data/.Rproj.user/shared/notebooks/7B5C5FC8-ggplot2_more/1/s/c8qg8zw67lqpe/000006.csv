@@ -1,0 +1,6 @@
+"0","g + geom_point(aes(color = shangai),"
+"0","               size = 2,"
+"0","               alpha = 1) +"
+"0","    labs(title =""Countries"") +"
+"0","    labs(x = ""Enrollment rate"","
+"0","         y = ""Attainment Rate"")"

@@ -1,0 +1,375 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+rm(list = ls())
+library(dplyr)
+```
+
+## Air Pollution data 
+
+Particulate matter (less than 2.5 microns in diameter) is a fancy name for dust, and breathing in dust might pose health hazards to the population. We'll study data from two years, 1999 (when monitoring of particulate matter started) and 2012. Our goal is to see if there's been a noticeable decline in this type of air pollution between these two years.
+
+
+Data can be downloaded at https://www.epa.gov/data 
+
+data is located in data/pm25_data folder
+
+na.strings: a character vector of strings which are to be interpreted as NA values. 
+
+comment.char: to ignore 
+```{r}
+pm0 <- read.table("data/pm25_data/RD_501_88101_1999-0.txt", sep = "|",
+           header = F, comment.char = "#", na.strings = "")
+dim(pm0)
+```
+
+strsplit: Split the elements of a character vector x into substrings according to the matches to substring split within them.
+
+This produce a list.
+```{r}
+colnames <- readLines("data/pm25_data/RD_501_88101_1999-0.txt", 1)
+colnames <- strsplit(colnames, split = "|", fixed = T)
+colnames[[1]]
+```
+```{r}
+names(pm0) <- colnames[[1]]
+names(pm0)
+```
+make names valid
+
+```{r}
+names(pm0) = make.names(names(pm0))
+names(pm0)
+```
+
+pull out a variable
+
+```{r}
+x0 <- pm0$Sample.Value
+
+class(x0)
+```
+```{r}
+str(x0)
+```
+
+Mean is right to the median.Right skewed (positive skewed)
+
+```{r}
+summary(x0)
+```
+
+Large number of missing values (About 11%)
+```{r}
+mean(is.na(x0))
+```
+
+Let's read 2012 data
+
+I will use fread from data.table package
+```{r}
+library(data.table)
+
+pm1 <- fread("data/pm25_data/RD_501_88101_2012-0.txt", sep = "|",
+             header = F, na.strings = "")
+dim(pm1)
+```
+
+fread (data.table) is much faster and useful but, i could not make one footer row not to be read in advance. It is discarded when reading the file.
+
+```{r, warning=F}
+system.time(pm1 <- fread("data/pm25_data/RD_501_88101_2012-0.txt", sep = "|",
+             header = F, na.strings = ""))
+
+system.time(pm1 <- read.table("data/pm25_data/RD_501_88101_2012-0.txt", sep = "|",
+             header = F, na.strings = ""))
+```
+
+read file with read.table, again
+
+```{r}
+pm1 <- read.table("data/pm25_data/RD_501_88101_2012-0.txt", sep = "|",
+             header = F, na.strings = "", comment.char = "#")
+```
+
+```{r}
+dim(pm1)
+```
+
+Given the dimension of the dataset, what is the estimate size of the file?
+
+```{r}
+1304287 * 28 * 2^3 / 2^10  # kilo byte
+1304287 * 28 * 2^3 / 2^20  # mega byte
+1304287 * 28 * 2^3 / 2^30  # giga byte
+
+
+
+object.size(pm1)
+```
+
+```{r}
+names(pm1) <- make.names(colnames[[1]])
+names(pm1)
+```
+
+let's pull out sample.value from pm1
+```{r}
+x1 <- pm1$Sample.Value
+
+str(x1)
+```
+
+```{r}
+summary(x1)
+```
+
+```{r}
+summary(x0)
+```
+
+```{r}
+mean(is.na(x1))
+```
+
+We see that both the median and the mean of measured particulate matter have declined from 1999 to
+2012. In fact, all of the measurements, except for the maximum and missing values (Max and NA's), have decreased. Even the Min has gone down from 0 to -10.00! We'll address what a negative measurment might mean a little later. Note that the Max has increased from 157 in 1999 to 909 in 2012. This is quite high and might reflect an error in the table or malfunctions in some monitors.
+```{r, fig.height=2}
+boxplot(x0, x1)
+```
+
+since distributions are skewed 
+
+Also, there are negative numbersin data, this will cause warnings
+
+```{r}
+boxplot(log(x0), log(x1))
+boxplot(log10(x0), log10(x1))
+```
+
+Work on negtive numbers in x1 file
+
+```{r}
+negative  <- x1 < 0
+sum(negative, na.rm = T)
+```
+
+```{r}
+mean(negative, na.rm = T)
+```
+
+Let's look at dates
+```{r}
+dates <- pm1$Date
+str(dates)
+```
+
+these are in integer format, we need to convert them to date format
+
+1. Using lubridate package
+```{r}
+library(lubridate)
+dates1 <- ymd(pm1$Date)
+str(dates1)
+```
+
+```{r}
+dates2 <- as.Date(as.character(dates), format = "%Y%m%d")
+str(dates2)
+```
+
+Histogram
+```{r}
+hist(dates1, "month")
+```
+Negative tends to occur in winter months
+
+```{r}
+hist(dates1[negative], breaks  =  "month")
+```
+
+```{r}
+library(ggplot2)
+qplot(dates1[negative])
+```
+Now we'll change focus a bit and instead of looking at all the monitors throughout the country and the data they recorded, we'll try to find one monitor that was taking measurements in both 1999 and 2012. This will allow us to control for different geographical and environmental variables that might have affected air quality in different areas. We'll narrow our search and look just at monitors in New York State.
+
+```{r}
+site0 <- unique(subset(pm0, State.Code == 36, c(County.Code, Site.ID)))
+site1 <- unique(subset(pm1, State.Code == 36, c(County.Code, Site.ID)))
+head(site0)
+```
+
+Now concatenate these selected two columns, an make and ID
+
+```{r}
+site10 <- paste(site0[, 1], site0[, 2], sep = ".")
+site11 <- paste(site1[, 1], site1[, 2], sep = ".")
+head(site10)
+```
+
+Now compare/find intersection of monitor/county combinations in both datasets
+
+```{r}
+both <- intersect(site10, site11)
+both
+```
+
+We have 10 monitor/county combinations in both datasets
+
+```{r}
+pm0$county.site <- with(pm0, paste(County.Code, Site.ID, sep = "."))
+pm1$county.site <- with(pm1, paste(County.Code, Site.ID, sep = "."))
+
+```
+
+Subset data to New York state
+
+```{r}
+newyork0 <- subset(pm0, State.Code==36 & county.site %in% both)
+newyork1 <- subset(pm1, State.Code==36 & county.site %in% both)
+```
+
+Now take a look at how many observations we have in each monitoring sites
+
+```{r}
+unique(newyork0$county.site)
+```
+
+```{r}
+table(newyork0$county.site)
+table(newyork1$county.site)
+```
+
+Alternatively
+
+```{r}
+sapply(split(newyork0, newyork0$county.site), nrow)
+sapply(split(newyork1, newyork1$county.site), nrow)
+```
+
+Now focus on county 63 monitor 2008
+
+```{r}
+pm0sub <- subset(pm0, State.Code == 36 & County.Code == 63 & Site.ID == 2008)
+pm1sub <- subset(pm1, State.Code == 36 & County.Code == 63 & Site.ID == 2008)
+
+dim(pm0sub)
+dim(pm1sub)
+```
+
+No visualize how pm data changes overtime in a year.
+
+```{r}
+x0sub <- pm0sub$Sample.Value
+x1sub <- pm1sub$Sample.Value
+
+
+dates10 <- as.Date(as.character(pm0sub$Date), format = "%Y%m%d")
+dates11 <- as.Date(as.character(pm1sub$Date), format = "%Y%m%d")
+
+str(dates10)
+```
+
+```{r}
+plot(dates10, x0sub)
+
+plot(dates11, x1sub)
+```
+
+Make panel of plots
+
+```{r}
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
+plot(dates10, x0sub, pch = 20)
+abline(h = median(x0sub, na.rm = T))
+plot(dates11, x1sub, pch = 20)
+abline(h = median(x1sub, na.rm = T))
+```
+
+
+```{r}
+range <- range(x0sub, x1sub, na.rm = T)
+range
+```
+
+```{r}
+par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
+plot(dates10, x0sub, pch = 20, ylim = range)
+abline(h = median(x0sub, na.rm = T))
+plot(dates11, x1sub, pch = 20, ylim = range)
+abline(h = median(x1sub, na.rm = T))
+```
+
+Now, analyze statewise differences. The last avenue of this data we'll explore (and we'll do it quickly) concerns a comparison of all the states' mean pollution levels. This is important because the states are responsible for implementing the regulations set at the federal level by the EPA.
+
+```{r}
+mean0 <- with(pm0,
+     tapply(Sample.Value, State.Code, mean, na.rm = T))
+mean0
+```
+
+```{r}
+summary(mean0)
+```
+
+```{r}
+mean1 <- with(pm1,
+     tapply(Sample.Value, State.Code, mean, na.rm = T))
+mean1
+```
+
+```{r}
+d0 <- data.frame(state = names(mean0), mean = mean0)
+head(d0)
+```
+We see merge has 52 rows and 3 columns. Since the Virgin Island data was missing from d1, it is excluded from mrg.
+```{r}
+d1 <- data.frame(state = names(mean1), mean = mean1)
+head(d1)
+```
+
+```{r}
+merged <- merge(d0, d1, by = "state")
+merged
+```
+
+```{r, fig.height=2.5, fig.width=4}
+par(mfrow = c(1, 2))
+with(merged, plot(rep(1999, 52), mean.x, xlim = c(1998, 2013)))
+with(merged, points(rep(2012, 52), mean.y))
+```
+The first of these is rep(1,52). This tells the plot routine that the x coordinates for all 52 points are 1.
+```{r}
+with(merged,
+     plot(rep(1999, 52), mean.x, xlim = c(1998, 2013)), ylim=c(0, 20))
+with(merged,
+     points(rep(2012, 52), mean.y), ylim=c(0, 20))
+segments(rep(1999, 52), merged[, 2], rep(2012, 52), merged[, 3])
+```
+
+We see from the plot that the vast majority of states have indeed improved their particulate matter counts so the general trend is downward. There are a few exceptions. (The topmost point in the 1999 column is actually two points that had very close measurements.)
+
+For fun, let's see which states had higher means in 2012 than in 1999. Just use the mrg[mrg$mean.x < mrg$mean.y, ] notation to find the rows of mrg with this particulate property.
+
+```{r}
+merged[merged$mean.x < merged$mean.y, ]
+```
+This concludes the lesson, comparing air pollution data from two years in
+different ways. First, we looked at measures of the entire set of monitors, then we compared the two measures from a particular monitor, and finally, we looked a the mean measures of the individual states.
+
+
+
+
+
+
+
+
+
+
+
+
+

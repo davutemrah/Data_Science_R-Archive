@@ -1,0 +1,2 @@
+"0","pm1 <- read.table(""data/pm25_data/RD_501_88101_2012-0.txt"", sep = ""|"","
+"0","             header = F, na.strings = """", comment.char = ""#"")"

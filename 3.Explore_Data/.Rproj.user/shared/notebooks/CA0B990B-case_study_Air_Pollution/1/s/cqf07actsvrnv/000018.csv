@@ -1,0 +1,2 @@
+"0","par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))"
+"0","plot(dates10, x0sub, pch = 20)"

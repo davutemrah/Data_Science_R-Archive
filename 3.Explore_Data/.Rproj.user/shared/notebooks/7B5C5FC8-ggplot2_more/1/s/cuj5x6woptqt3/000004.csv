@@ -1,0 +1,2 @@
+"0","g <- ggplot(test, aes(x = x, y = y))"
+"0","g + geom_line()"

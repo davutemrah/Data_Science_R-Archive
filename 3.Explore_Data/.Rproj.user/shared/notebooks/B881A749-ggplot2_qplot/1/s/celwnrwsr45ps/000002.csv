@@ -1,0 +1,4 @@
+"0","if (!require(ggplot2)) install.packages('ggplot2')"
+"2","Loading required package: ggplot2
+"
+"0","library(ggplot2)"

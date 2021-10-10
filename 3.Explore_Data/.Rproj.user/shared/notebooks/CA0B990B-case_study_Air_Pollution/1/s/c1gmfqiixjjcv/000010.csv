@@ -1,0 +1,2 @@
+"0","with(merged, points(rep(2012, 52), mean.y) ,"
+"0","     ylim=c(0, 20))"

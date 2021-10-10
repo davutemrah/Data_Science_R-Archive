@@ -1,0 +1,204 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## MOre on ggplot2
+
+* data frame
+* aesthetic mappings; color, size
+* geoms: points, lines, shapes
+* facets
+* stats
+* scales
+* coordinate system
+
+
+* Plots are built up in layers
+    - Plot the data
+    - overlay a summary
+    - Metadata and annotation
+    
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r}
+edu <- read_xlsx(path = "./data/education.xlsx")
+df <- 
+    read_xlsx(path = "./data/output.xlsx") %>%
+    full_join(edu, by = c("con3code", "year")) %>%
+    mutate(shangai = as.factor(shangai)) %>%
+    drop_na()
+names(df)
+```
+### Basic Plot
+
+```{r}
+qplot(x = enrollrate8, y = attainrate8,
+      data = df,
+          facets = . ~ factor(shangai), 
+          geom = c("point", "smooth"),
+          method = "lm")
+```
+
+```{r}
+g <- ggplot(df, aes(x = enrollrate8, y = attainrate8))
+
+summary(g)
+```
+```{r}
+print(g)
+```
+
+##### You can add objects
+
+```{r}
+g + geom_point()
+```
+
+### loess smooth
+
+```{r}
+g + geom_point() + geom_smooth()
+```
+#### linear model
+```{r}
+g + geom_point() + geom_smooth(method = "lm")
+```
+#### Facet is on factor variables
+
+labeling is important for factor variables
+
+```{r}
+g + geom_point()  + geom_smooth(method = "lm") +
+    facet_grid(. ~ shangai)
+```
+
+## Annotation
+
+labels: xlab, ylab, ggtitle
+theme(legend.position = "none")
+
+theme_gray()
+theme_bw()
+
+```{r}
+g + geom_point(color = "steelblue",
+               size = 4,
+               alpha = 1/2)
+```
+
+```{r}
+g + geom_point(aes(color = shangai),
+               size = 4,
+               alpha = 0.5)
+```
+
+### modify labels
+
+```{r}
+g + geom_point(aes(color = shangai),
+               size = 2,
+               alpha = 1) +
+    labs(title ="Countries") +
+    labs(x = "Enrollment rate",
+         y = "Attainment Rate")
+```
+
+#### Modify smooth function
+
+```{r}
+g + geom_point(aes(color = shangai),
+               size = 2,
+               alpha = 1) +
+    labs(title ="Countries") +
+    labs(x = "Enrollment rate",
+         y = "Attainment Rate") +
+    geom_smooth(size = 4, 
+                linetype = 3,
+                method = "lm",
+                se = F)
+```
+
+
+
+#### Modify theme
+
+```{r}
+g + geom_point(aes(color = shangai),
+               size = 2,
+               alpha = 1) +
+    theme_bw(base_family = "Times")
+```
+
+#### Note on Axis and comparison
+
+same and graph approach, but outlier is not shown in base plot
+
+```{r}
+test <- tibble(x = 1:100, y = rnorm(100))
+# outlier created
+test[50, 2] <- 100
+
+plot(test$x, test$y, type = "l", ylim = c(-3, 3))
+```
+
+
+```{r}
+g <- ggplot(test, aes(x = x, y = y))
+g + geom_line()
+```
+
+#### Now modify y limit
+
+Here outlier is not missing
+
+```{r}
+g + geom_line() + coord_cartesian(ylim = c(-3, 3))
+```
+
+#### Outlier is missing
+
+```{r}
+g + geom_line() + ylim(-3, 3)
+```
+
+### Complex example
+
+#### prepare data
+create factor variable
+
+```{r}
+df2 <- filter(df, year == 2016)
+cutpoints <- quantile(df$patent_app_res, seq(0, 1, length = 5), 
+                      na.rm = T)
+
+df$new_uni <- cut(df$patent_app_res, cutpoints)
+
+levels(df$new_uni)
+```
+
+```{r}
+g <- ggplot(df, aes(x = enrollrate8,
+                    y = attainrate8))
+
+g + geom_point(alpha = 0.3) +
+    facet_wrap(shangai ~ new_uni, nrow = 3, ncol = 3) +
+    geom_smooth(method = "lm", se = FALSE, col = "steelblue") +
+    theme_bw(base_family = "Avenir", base_size = 10) +
+    labs(x = "Enrollment Rate - 8") +
+    labs(y = "Attainment Rate - 8") +
+    labs(title = "Last graph")
+    
+```
+
+
+
+
+
+

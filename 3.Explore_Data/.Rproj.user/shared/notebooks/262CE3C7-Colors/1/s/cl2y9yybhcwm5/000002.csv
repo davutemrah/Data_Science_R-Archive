@@ -1,0 +1,11 @@
+"0","colorRamp(""gray"")"
+"1","function (x) 
+"
+"1","roundcolor(cbind(palette[[1L]](x), palette[[2L]](x), palette[[3L]](x), 
+"
+"1","    if (alpha) palette[[4L]](x))) * 255
+"
+"1","<bytecode: 0x7fab9c28b3c8>
+"
+"1","<environment: 0x7fab7bf5f518>
+"

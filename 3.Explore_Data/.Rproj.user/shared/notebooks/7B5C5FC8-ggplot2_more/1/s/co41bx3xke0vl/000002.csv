@@ -1,0 +1,34 @@
+"0","g <- ggplot(df, aes(x = enrollrate8, y = attainrate8))"
+"0",""
+"0","summary(g)"
+"1","data: con3code, year, shangai, unitotal_S,
+  patent_app_res, pub_sci_tech, enrollcount8,
+  attainrate8, enrollrate8, enroll8_percap,
+  attaincount8, attain8_percap [358x12]
+"
+"1","mapping:  "
+"1",""
+"1","x = ~enrollrate8, y = ~attainrate8"
+"1",""
+"1","
+"
+"1","faceting: "
+"1","<ggproto object: Class FacetNull, Facet, gg>
+    compute_layout: function
+    draw_back: function
+    draw_front: function
+    draw_labels: function
+    draw_panels: function
+    finish_data: function
+    init_scales: function
+    map_data: function
+    params: list
+    setup_data: function
+    setup_params: function
+    shrink: TRUE
+    train_scales: function
+    vars: function
+    super:  <ggproto object: Class FacetNull, Facet, gg>"
+"1",""
+"1","
+"

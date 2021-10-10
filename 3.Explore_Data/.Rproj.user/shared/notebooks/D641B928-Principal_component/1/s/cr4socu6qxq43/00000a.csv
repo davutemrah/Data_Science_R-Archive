@@ -1,0 +1,4 @@
+"0","svd1 <- svd(scale(dmordered))"
+"0","pca1 <- prcomp(dmordered, scale = TRUE)"
+"0","plot(pca1$rotation[, 1], svd1$v[, 1], pch = 19, xlab=""Principal Component 1"","
+"0","     ylab = ""Right Singular Vector 1"")"

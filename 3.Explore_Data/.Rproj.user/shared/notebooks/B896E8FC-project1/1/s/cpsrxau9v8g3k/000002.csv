@@ -1,0 +1,10 @@
+"0","```r
+# 2. Create a plot
+hist(df$Global_active_power,
+    xlab = \"Global Active Power (kilowatts)\",
+    col = \"red\",
+    main = \"Global Active Power\",
+    freq = TRUE,
+    ylim = c(0, 1200), 
+    cex.axis = 0.7)
+```"

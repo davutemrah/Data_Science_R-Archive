@@ -1,0 +1,4 @@
+"0","```r
+# Close the pdf file
+dev.off() 
+```"

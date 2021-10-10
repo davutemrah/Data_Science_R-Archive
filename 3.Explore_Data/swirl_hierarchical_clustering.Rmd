@@ -1,0 +1,245 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+In this lesson we'll learn about hierarchical clustering, a simple way of quickly examining and displaying multi-dimensional data. This technique is usually most useful in the early stages of analysis when you're trying to get an understanding of the data, e.g., finding some pattern or relationship between different factors or variables. As the name suggests hierarchical clustering creates a hierarchy of clusters.
+
+
+Clustering organizes data points that are close into groups. So obvious questions are "How do we define close?", "How do we group things?", and "How do we interpret the grouping?" Cluster analysis is a very important topic in data analysis.
+
+Hierarchical clustering is an agglomerative, or bottom-up, approach. From Wikipedia (http://en.wikipedia.org/wiki/Hierarchical_clustering), we learn that in this method, "each observation starts in its own cluster, and pairs of clusters are merged as one moves up the hierarchy." This means that we'll find the closest two points and put them together in one cluster, then find the next closest pair in the updated picture, and so forth. We'll repeat this process until we reach a reasonable stopping place.
+
+Note the word "reasonable". There's a lot of flexibility in this field and how you perform your analysis depends on your problem. Again, Wikipedia tells us, "one can decide to stop clustering either when the clusters are too far apart to be merged (distance criterion) or when there is a sufficiently small number of clusters (number criterion)."
+
+First, how do we define close? This is the most important step and there are several possibilities depending on the questions you're trying to answer and the data you have. Distance or similarity are usually the metrics used.
+
+However, there are several ways to measure distance or similarity. Euclidean distance and correlation similarity are continuous measures, while Manhattan distance is a binary measure. In this lesson we'll just briefly discuss the first and last of these. It's important that you use a measure of distance that fits your problem.
+
+Euclidean distance is what you learned about in high school algebra. Given two points on a plane, (x1,y1) and (x2,y2), the Euclidean distance is the square root of the sums of the squares of the distances between the two x-coordinates (x1-x2) and the two y-coordinates (y1-y2). You probably recognize this as an application of the Pythagorean theorem which yields the length of the hypotenuse of a right triangle.
+
+Euclidean distance is distance "as the crow flies". Many applications, however, can't realistically use crow-flying distance. Cars, for instance, have to follow roads.In this case, we can use Manhattan or city block distance (also known as a taxicab metric). This picture, copied from http://en.wikipedia.org/wiki/Taxicab_geometry, shows what this means.
+
+More formally, Manhattan distance is the sum of the absolute values of the distances between each coordinate, so the distance between the points (x1,y1) and (x2,y2) is |x1-x2|+|y1-y2|. As with Euclidean distance, this too generalizes to more than 2 dimensions.
+
+Run the R command dist with the argument dataFrame to compute the distances between all pairs of these points. By default dist uses Euclidean distance as its metric, but other metrics such as Manhattan, are available. Just use the default.
+```{r}
+df <- read_excel("./data/output.xlsx")
+distxy <- dist(dataFrame)
+
+distxy
+```
+
+So 0.0815 (units are unspecified) between points 5 and 6 is the shortest distance. We can put these points in a single cluster and look for another close pair of points.
+
+We can keep going like this in the obvious way and pair up individual points, but as luck would have it, R provides a simple function which you can call which creates a dendrogram for you. It's called hclust() and takes as an argument the pairwise distance matrix which we looked at before. We've stored this matrix for you in a variable called distxy. Run hclust now with distxy as its argument and put the result in the variable hc.
+
+```{r}
+hc <- hclust(distxy)
+
+plot(hc)
+```
+
+
+```{r}
+plot(as.dendrogram(hc))
+```
+
+```{r}
+abline(h = 1.5,  col = "blue")
+```
+
+```{r}
+abline(h = .4,  col = "red")
+```
+
+```{r}
+abline(h = .05,  col = "green")
+```
+So the number of clusters in your data depends on where you draw the line! (We said there's a lot of flexibility here.) Now that we've seen the practice, let's go back to some "theory". Notice that the two original groupings, 5 through 8, and 9 through 12, are connected with a horizontal line near the top of the display. You're probably wondering how distances between clusters of points are measured.
+
+So if we were measuring the distance between the two clusters of points (1 through 4) and (5 through 8), using complete linkage as the metric we would use the distance between points 4 and 8 as the measure since this is the largest distance between the pairs of those groups.
+
+The distance between the two clusters of points (9 through 12) and (5 through 8), using complete linkage as the metric, is the distance between points 11 and 8 since this is the largest distance between the pairs of those groups.
+
+As luck would have it, the distance between the two clusters of points (9 through 12) and (1 through 4), using complete linkage as the metric, is the distance between points 11 and 4.
+
+
+ We've created the dataframe dFsm for you containing these 3 points, 4, 8, and 11. Run dist on dFsm to see what
+| the smallest distance between these 3 points is.
+
+
+dist(dFsm)
+
+
+We see that the smallest distance is between points 2 and 3 in this reduced set, (these are actually points 8 and 11 in the original set), indicating that the two clusters these points represent ((5 through 8) and (9 through 12) respectively) would be joined (at a distance of 1.869) before being connected with the third cluster (1 through 4). This is consistent with the dendrogram we plotted.
+
+The second way to measure a distance between two clusters that we'll just mention is called average linkage. First you compute an "average" point in each cluster (think of it as the cluster's center of gravity). You do this by computing the mean (average) x and y coordinates of the points in the cluster.
+
+Then you compute the distances between each cluster average to compute the intercluster distance.
+
+In our simple set of data, the average and complete linkages aren't that different, but in more complicated
+| datasets the type of linkage you use could affect how your data clusters. It is a good idea to experiment with
+| different methods of linkage to see the varying ways your data groups. This will help you determine the best way
+| to continue with your analysis.
+
+
+## Heatmap
+
+heat map is "a graphical representation of data where the individual values contained in a matrix are represented as colors. ... Heat maps originated in 2D displays of the values in a data matrix. Larger values were represented by small dark gray or black squares (pixels) and smallervalues by lighter squares."
+
+You've probably seen many examples of heat maps, for instance weather radar and displays of ocean salinity.
+
+```{r}
+heatmap(dataMatrix, col = cm.colors(25))
+```
+We've subsetted some vehicle data from mtcars, the Motor Trend Car Road Tests which is part of the package datasets. The data is in the matrix mt and contains 6 factors of 11 cars. Run heatmap now with mt as its only argument.
+```{r}
+heatmap(mt)
+```
+
+This looks slightly more interesting than the heatmap for the point data. It shows a little better how the rows and columns are treated (clustered and colored) independently of one another. To understand the disparity in color (between the left 4 columns and the right 2) look at mt now.
+```{r}
+mt
+```
+
+See how four of the columns are all relatively small numbers and only two (disp and hp) are large? That explains the big difference in color columns. Now to understand the grouping of the rows call plot with one argument, the dendrogram object denmt we've created for you.
+
+```{r}
+plot(denmt)
+```
+
+We see that this dendrogram is the one displayed at the side of the heat map. How was this created? Recall that we generalized the distance formula for more than 2 dimensions. We've created a distance matrix for you, distmt. Look at it now.
+
+What is the purpose of hierarchical clustering?
+Give an idea of the relationships between variables or observations
+
+
+## K-Means
+
+In this lesson we'll learn about k-means clustering, another simple way of examining and organizing multi-dimensional data. As with hierarchical clustering, this technique is most useful in the early stages of analysis when you're trying to get an understanding of the data, e.g., finding some pattern or relationship between different factors or variables.
+
+ R documentation tells us that the k-means method "aims to partition the points into k groups such that the sum of squares from points to the assigned cluster centres is minimized."
+
+Since clustering organizes data points that are close into groups we'll assume we've decided on a measure of distance, e.g., Euclidean.
+
+As we said, k-means is a partioning approach which requires that you first guess how many clusters you have (or want). Once you fix this number, you randomly create a "centroid" (a phantom point) for each cluster and assign each point or observation in your dataset to the centroid to which it is closest. Once each point is assigned a centroid, you readjust the centroid's position by making it the average of the points assigned to it.
+
+
+Once you have repositioned the centroids, you must recalculate the distance of the observations to the centroids and reassign any, if necessary, to the centroid closest to them. Again, once the reassignments are done, readjust the positions of the centroids based on the new cluster membership. The process stops once you reach an iteration in which no adjustments are made or when you've reached some predetermined maximum number of iterations.
+
+So k-means clustering requires some distance metric (say Euclidean), a hypothesized fixed number of clusters, and an initial guess as to cluster centroids. As described, what does this process produce?
+
+When it's finished k-means clustering returns a final position of each cluster's centroid as well as the assignment of each data point or observation to a cluster.
+
+We've created two 3-long vectors for you, cx and cy. These respectively hold the x- and y- coordinates for 3 proposed centroids. For convenience, we've also stored them in a 2 by 3 matrix cmat. The x coordinates are in the first row and the y coordinates in the second. Look at cmat now.
+```{r}
+points(cx, cy, col = c("red", "orange", "purple"), pch = 3, cex = 2, lwd = 2)
+```
+
+```{r}
+apply(distTmp, 2, which.min)
+```
+
+```{r}
+points(x, y, pch = 19, cex = 2, col = cols1[newClust])
+```
+Now we have to recalculate our centroids so they are the average (center of gravity) of the cluster of points
+assigned to them. We have to do the x and y coordinates separately. We'll do the x coordinate first. Recall that the vectors x and y hold the respective coordinates of our 12 data points.
+
+We can use the R function tapply which applies "a function over a ragged array". This means that every element of the array is assigned a factor and the function is applied to subsets of the array (identified by the factor vector). This allows us to take advantage of the factor vector newClust we calculated. Call tapply now with 3 arguments, x (the data), newClust (the factor array), and mean (the function to apply).
+```{r}
+tapply(x, newClust, mean)
+```
+
+Now that we have new x and new y coordinates for the 3 centroids we can plot them. We've stored off the coordinates for you in variables newCx and newCy. Use the R command points with these as the first 2 arguments. In addition, use the arguments col set equal to cols1, pch equal to 8, cex equal to 2 and lwd also equal to 2.
+
+```{r}
+points(newCx, newCy, col = cols1, pch = 8, cex = 2, lwd = 2)
+```
+We see how the centroids have moved closer to their respective clusters.
+
+```{r}
+mdist(x, y, newCx, newCy)
+```
+
+Now call apply with 3 arguments, distTmp2, 2, and which.min to find the new cluster assignments for the points.
+
+```{r}
+apply(distTmp2, 2, which.min)
+```
+
+```{r}
+
+points(x, y, pch = 19, cex=2, col = cols1[newClust2])
+
+```
+Now use tapply to find the x coordinate of the new centroid. Recall there are 3 arguments, x, newClust2, and mean.
+```{r}
+tapply(x, newClust2, mean)
+tapply(y, newClust2, mean)
+```
+
+ We've stored off these coordinates for you in the variables finalCx and finalCy. Plot these new centroids using the points function with 6 arguments. The first 2 are finalCx and finalCy. The argument col should equal cols1, pch should equal 9, cex 2 and lwd 2.
+
+```{r}
+points(finalCx, finalCy, col = cols1, pch = 9, cex =2, lwd=2)
+```
+
+
+It should be obvious that if we continued this process points 5 through 8 would all turn red, while points 1 through 4 stay orange, and points 9 through 12 purple.
+
+Now that you've gone through an example step by step, you'll be relieved to hear that R provides a command to do all this work for you. Unsurprisingly it's called kmeans and, although it has several parameters, we'll just mention four. These are x, (the numeric matrix of data), centers, iter.max, and nstart. The second of these (centers) can be either a number of clusters or a set of initial centroids. The third, iter.max, specifies the maximum number of iterations to go through, and nstart is the number of random starts you want to try if you specify centers as a number.
+```{r}
+str(kmeans)
+
+kmeans(dataFrame, centers = 3)
+```
+```{r}
+kmObj$iter
+```
+Two iterations as we did before. We just want to emphasize how you can access the information available to you. Let's plot the data points color coded according to their cluster. This was stored in kmObj$cluster. Run plot with 5 arguments. The data, x and y, are the first two; the third, col is set equal to kmObj$cluster, and the last two are pch and cex. The first of these should be set to 19 and the last to 2.
+```{r}
+plot(x, y, col = kmObj$cluster, pch=19, cex=2)
+
+```
+
+Now add the centroids which are stored in kmObj$centers. Use the points function with 5 arguments. The first two are kmObj$centers and col=c("black","red","green"). The last three, pch, cex, and lwd, should all equal 3.
+
+```{r}
+points(kmObj$centers, col=c("black","red","green"), pch = 3, cex = 3, lwd = 3)
+
+```
+
+Now for some fun! We want to show you how the output of the kmeans function is affected by its random start (when you just ask for a number of clusters). With random starts you might want to run the function several times to get an idea of the relationships between your observations. We'll call kmeans with the same data points (stored in dataFrame), but ask for 6 clusters instead of 3
+
+
+We'll plot our data points several times and each time we'll just change the argument col which will show us how the R function kmeans is clustering them. So, call plot now with 5 arguments. The first 2 are x and y. The third is col set equal to the call kmeans(dataFrame,6)$cluster. The last two (pch and cex) are set to 19 and 2 respectively.
+
+```{r}
+plot(x,y, col = kmeans(dataFrame,6)$cluster, pch = 19, cex = 2)
+
+# See how the points cluster?
+
+points(x,y, col = kmeans(dataFrame,6)$cluster, pch = 3, cex = 3, lwd = 3)
+
+# See how the clustering has changed?
+
+# So the clustering changes with different starts. Perhaps 6 is too many clusters? Let's review!
+
+points(x,y, col = kmeans(dataFrame,6)$cluster, pch = 3, cex = 3, lwd = 3)
+
+```
+
+K-means clustering requires you to specify a number of clusters before you begin.
+
+K-means clustering does not require you to specify a number of iterations before you begin.
+
+Every data set does not a fixed number of clusters.
+
+When starting kmeans with random centroids, you will not always end up with the same final clustering.
+
+
+

@@ -1,0 +1,254 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+summary(pollution$pm25)
+
+quanrtile(pollution$pm25)
+```
+
+```{r}
+boxplot(ppm, col = "green")
+abline(h = 12)
+```
+
+```{r}
+hist(ppm, col = "green")
+
+rug(ppm)
+```
+
+```{r}
+hist(ppm, col = "green", breaks = 100)
+rug(ppm)
+abline(v = median(ppm), col = "magenta", lwd = 4)
+```
+
+```{r}
+reg <- table(pollution$region)
+```
+
+```{r}
+barplot(reg, col = "wheat", main = "Number of Counties in Each Region")
+```
+
+```{r}
+boxplot( pm25 ~ region, data = pollution, col = "red")
+```
+
+```{r}
+par(mfrow=c(2,1),mar=c(4,4,2,1))
+east <- subset(pollution, region == "east")
+hist(east$pm25, col = "green")
+hist(subset(pollution, region=="west")$pm25, col = "green")
+```
+
+```{r}
+with(pollution, plot(latitude, pm25))
+abline(h = 12, lwd = 2, lty = 2)
+```
+
+```{r}
+plot(pollution$latitude, ppm, col = pollution$region)
+abline(h = 12, lwd = 2, lty = 2)
+```
+
+```{r}
+par(mfrow = c(1, 2), mar = c(5, 4, 2, 1))
+west <- subset(pollution, region == "west")
+plot(west$latitude, west$pm25, main = "West")
+plot(east$latitude, east$pm25, main = "East")
+
+```
+
+
+```{r}
+?Devices
+```
+
+
+```{r}
+pdf(file="myplot.pdf") 
+
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser data")
+
+dev.off()
+```
+
+
+There are two basic types of file devices, vector and bitmap devices. These use different formats and have different characteristics. Vector formats are good for line drawings and plots with solid colors using a modest number of points, while bitmap formats are good for plots with a large number of points, natural scenes or web-based plots.
+
+
+ We'll mention 4 specific vector formats. The first is pdf, which we've just used in our example. This is useful for line-type graphics and papers. It resizes well, is usually portable, but it is not efficient if a plot has many objects/points.
+
+
+We'll also mention 4 different bitmap formats. The first is png (Portable Network Graphics) which is good for line drawings or images with solid colors. It uses lossless compression (like the old GIF format), and most web browsers can read this format natively. In addition, png is good for plots with many points, but it does not resize well.
+
+In contrast, jpeg files are good for photographs or natural scenes. They use lossy compression, so they're good for plots with many points. Files in jpeg format don't resize well, but they can be read by almost any computer and any web browser. They're not great for line drawings.The last two bitmap formats are tiff, an older lossless compression meta-format and bmp which is a native Windows bitmapped format.
+
+
+ The currently active graphics device can be found by calling dev.cur(). Try it now to see what number is assigned to your pdf device.
+ 
+ 
+ You can also copy a plot from one device to another. This can save you some time but beware! Copying a plot is not an exact operation, so the result may not be identical to the original. R provides some functions to help you do this. The function dev.copy copies a plot from one device to another, and dev.copy2pdf specifically copies a plot to a PDF file.
+
+```{r}
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser data")
+dev.copy(png, file = "geyserplot.png")
+```
+
+
+#### Base 
+
+ The first plotting system is the Base Plotting System which comes with R. It's the oldest system which uses a simple "Artist's palette" model. What this means is that you start with a blank canvas and build your plot up from there, step by step.
+
+Usually you start with a plot function (or something similar), then you use annotation functions to add to or modify your plot. R provides many annotating functions such as text, lines, points, and axis. R provides documentation for each of these. They all add to an already existing plot.
+
+Yes! The base system is very intuitive and easy to use when you're starting to do exploratory graphing and looking for a research direction. You can't go backwards, though, say, if you need to readjust margins or fix a misspelled a caption. A finished plot will be a series of R commands, so it's difficult to translate a finished plot into a different system.
+
+
+```{r}
+with(cars, plot(speed, dist))
+
+text(mean(cars$speed), max(cars$dist), "SWIRL rules!")
+```
+
+### Lattice system
+
+ The lattice system is most useful for conditioning types of plots which display how y changes with x across levels of z. The variable z might be a categorical variable of your data. This system is also good for putting many plots on a screen at once.
+
+The lattice system has several disadvantages. First, it is sometimes awkward to specify an entire plot in a single function call. Annotating a plot may not be especially intuitive. Second, using panel functions and subscripts is somewhat difficult and requires preparation. Finally, you cannot "add" to the plot once it is created as you can with the base system.
+
+
+So there are 4 categories and the 50 states are sorted into them appropriately. Let's use the lattice command xyplot to see how life expectancy varies with income in each of the four regions.
+
+```{r}
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4, 1))
+```
+
+```{r}
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(2, 2))
+
+```
+
+
+#### ggplot2
+
+Now for the last plotting system, ggplot2, which is a hybrid of the base and lattice systems. It automatically deals with spacing, text, titles (as Lattice does) but also allows you to annotate by "adding" to a plot (as Base does), so it's the best of both worlds.
+
+Its default mode makes many choices for you but you can still customize a lot. The package is based on a "grammar of graphics" (hence the gg in the name), so you can control the aesthetics of your plots. For instance, you can plot conditioning graphs and panel plots as we did in the lattice example.
+
+```{r}
+table(mpg$model)
+```
+
+```{r}
+qplot(displ, hwy, data = mpg)
+```
+
+
+Base - Which R plotting system is based on an artist's palette?
+ 
+Lattice - Which R plotting system does NOT allow you to annotate plots with separate calls?
+Lattice - Which R plotting system forces you to make your entire plot with one call?
+
+ggplot2 - Which R plotting system combines the best features of the other two?
+
+ggplot2 - Which R plotting system uses a graphics grammar?
+
+
+Before making a plot you have to determine where the plot will appear and what it will be used for.  Is there a large amount of data going into the plot? Or is it just a few points? Do you need to be able to dynamically resize the graphic?
+
+The base system is very intuitive and easy to use. You can't go backwards, though, say, if you need to readjust margins or have misspelled a caption. A finished plot will be a series of R commands, so it's difficult to translate a finished plot into a different system.
+
+As you'll see, most of the base plotting functions have many arguments, for example, setting the title, labels of axes, plot character, etc. Some of the parameters can be set when you call the function or they can be added later in a separate function call.
+
+```{r}
+range(airquality$Ozone, na.rm=TRUE)
+```
+
+```{r}
+boxplot(Ozone ~ Month, airquality, xlab = "Month", ylab = "Ozone (ppb)",
+        col.axis = "blue", col.lab = "red")
+
+title(main = "Ozone and Wind in New York City")
+```
+
+
+```{r}
+with(airquality, plot(Wind, Ozone))
+title(main = "Ozone and Wind in New York City")
+```
+
+```{r}
+# So there are a boatload (72) of parameters that par() gives you access to
+length(par())
+
+names(par())
+```
+
+So you can add text, title, points, and lines to an existing plot. To add lines, you give a vector of x values and a corresponding vector of y values (or a 2-column matrix); the function lines just connects the dots. The function text adds text labels to a plot using specified x, y coordinates.
+
+
+The function title adds annotations. These include x- and y- axis labels, title, subtitle, and outer margin. Two other annotating functions are mtext which adds arbitrary text to either the outer or inner margins of the plot and axis which adds axis ticks and labels. Another useful function is legend which explains to the reader what the symbols your plot uses mean.
+
+
+```{r}
+plot(airquality$Wind, airquality$Ozone, type = "n")
+
+title(main = "Wind and Ozone in NYC")
+
+may <- subset(airquality, Month == 5 )
+
+# Note we use points because we're adding to an existing plot.
+points(may$Wind, may$Ozone,  col = "blue", pch = 17)
+
+notmay <- subset(airquality, Month != 5)
+
+# Note we use points because we're adding to an existing plot.
+points(notmay$Wind, notmay$Ozone,  col = "red", pch = 8)
+
+legend("topright", pch = c(17, 8),  col = c("blue", "red"),
+       legend = c("May", "Other Months"))
+
+abline(v = median(airquality$Wind), lty = 2, lwd = 2)
+
+```
+
+
+```{r}
+par(mfrow = c(1, 2))
+
+plot(airquality$Wind, airquality$Ozone, main = "Ozone and Wind")
+plot(airquality$Ozone, airquality$Solar.R, main = "Ozone and Solar Radiation")
+
+```
+
+ Margins are specified as 4-long vectors of integers. Each number tells how many lines of text to leave at each side. The numbers are assigned clockwise starting at the bottom. The default for the inner margin is c(5.1, 4.1, 4.1, 2.1) so you can see we reduced each of these so we'll have room for some outer text.
+
+```{r}
+par(mfrow = c(1, 3), mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+
+plot(airquality$Wind, airquality$Ozone, main = "Ozone and Wind")
+
+plot(airquality$Solar.R, airquality$Ozone, main = "Ozone and Solar Radiation")
+
+plot(airquality$Temp, airquality$Ozone, main = "Ozone and Temperature")
+
+mtext("Ozone and Weather in New York City", outer = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+

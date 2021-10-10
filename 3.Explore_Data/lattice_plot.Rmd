@@ -1,0 +1,149 @@
+---
+title: "R Notebook"
+output: html_notebook
+toc: true
+---
+
+## Lattice Plotting System
+
+* independent from base plotting system
+* builds on grid package
+* plotting and annotations are done all at once
+* for some type of analysis it is easy to implement
+
+#### Functions
+* xyplot: scatterplot
+* bwplot: boxplot
+* histogram: 
+* stripplot: similar to boxplot
+* dotplot: violin strings
+* splom: scatterplot matrix
+* levelplot, contourplot: plotting image data
+
+* we can NOT mix functions of otherr plotting systems 
+
+### Lattice funstions
+
+xyplot(y ~ x| f*g, data),
+
+f and are conditioning factors like interactions
+
+### Simple Lattice plot
+
+```{r}
+library(lattice)
+library(datasets)
+
+# simple example
+xyplot(Ozone ~ Wind, data = airquality)
+```
+
+### Relationship between Ozone and Wind changes by months
+
+```{r}
+# convert month to a factor variable
+airquality <- transform(airquality, Month = factor(Month))
+
+xyplot(Ozone ~ Wind | Month, data = airquality, layout = c(5, 1))
+```
+
+### Lattice behaviour
+
+it becomes an R object
+```{r}
+graph1  <- xyplot(Ozone ~ Wind, data = airquality)  ## nothing shows up
+
+graph1
+```
+
+
+```{r}
+print(graph1)
+```
+
+### Lattice Panel Functions
+
+```{r}
+set.seed(10)
+
+x <- rnorm(100)
+f <- rep(0:1, each = 50)
+y <- x + f - f*x + rnorm(100, sd = 0.5)
+
+f <- factor(f, labels = c("Group 1", "Group 2"))
+
+xyplot(y ~ x | f, layout = c(2, 1)) 
+```
+lty=2 means dashed line
+
+```{r}
+## custom panel function
+
+xyplot(y ~ x | f, panel = function(x, y, ...){
+    panel.xyplot(x, y, ...)
+     # add a horizontal line, 
+    panel.abline(h = median(y), lty = 2)
+})
+```
+
+### Lattice Panel Functions: add a regression line
+
+col = 2 --- red line
+```{r}
+## custom panel function
+
+xyplot(y ~ x | f, panel = function(x, y, ...){
+    panel.xyplot(x, y, ...) # this is default panel function
+    
+     # add a simple regression line, 
+    panel.lmline(x, y, col = 2)
+})
+```
+
+
+```{r}
+## custom panel function
+xyplot(mpg$hwy ~ mpg$displ | factor(mpg$model), 
+       panel = function(x, y, ...){
+    panel.xyplot(mpg$hwy, mpg$displ, ...) # this is default panel function
+    
+     # add a simple regression line, 
+    panel.lmline(mpg$hwy, mpg$displ, col = 2)
+})
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

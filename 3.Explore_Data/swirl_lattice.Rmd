@@ -1,0 +1,65 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+### The Lattice graph system
+
+The lattice plotting system is completely separate and independent of the base plotting system. It's an add-on package so it has to be explicitly loaded with a call to the R function library. We've done this for you. The R Documentation tells us that lattice "is an implementation of Trellis graphics for R. It is a powerful and elegant high-level data visualization system with an emphasis on multivariate data."
+
+The second package in the lattice system is grid which contains the low-level functions upon which the lattice package is built. You, the user, seldom call functions from the grid package directly.
+
+```{r}
+library(lattice)
+```
+
+Unlike base plotting, the lattice system does not have a "two-phase" aspect with separate plotting and annotation. Instead all plotting and annotation is done at once with a single function call.
+
+The lattice system, as the base does, provides several different plotting functions. These include xyplot for creating scatterplots, bwplot for box-and-whiskers plots or boxplots, and histogram for histograms. There are several others (stripplot, dotplot, splom and levelplot), which we won't cover here.
+
+
+```{r}
+xyplot(Ozone ~ Wind , data = airquality)
+
+xyplot(Ozone ~ Wind , data = airquality, col = "red", pch = 8, main = "Big Apple Data")
+
+```
+
+```{r}
+xyplot(Ozone~Wind | as.factor(Month), data = airquality, layout = c(5, 1))
+```
+
+
+
+```{r}
+p <- xyplot(Ozone~Wind,data=airquality)
+
+names(p)
+```
+
+```{r}
+p[["formula"]]
+```
+
+```{r}
+xyplot(y ~ x | f, layout = c(2, 1))
+```
+
+Pretty cool, right? 35 panels, one for each combination of color and cut. The dots
+(pch=20) show how prices for the diamonds in each category (panel) vary depending on carat.
+
+```{r}
+xyplot(price~carat | color*cut, data = diamonds,
+       strip = FALSE, pch = 20, 
+       xlab = "myxlab", ylab = "myylab",
+       main = "mymain")
+```
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,2 @@
+"0","newyork0 <- subset(pm0, State.Code==36 & county.site %in% both)"
+"0","newyork1 <- subset(pm1, State.Code==36 & county.site %in% both)"

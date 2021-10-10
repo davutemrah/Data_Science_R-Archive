@@ -1,0 +1,2 @@
+"0",""
+"0","plot(rowMeans(dmordered), 40:1, xlab = ""Row Mean"", ylab = ""Row"", pch = 19)"

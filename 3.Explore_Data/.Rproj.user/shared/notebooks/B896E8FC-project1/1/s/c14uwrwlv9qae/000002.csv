@@ -1,0 +1,12 @@
+"0","```r
+memory_estimate <- 2075259*9*8
+
+print(paste(memory_estimate,\" \", \"byte\"))
+```"
+"1","[1] \"149418648   byte\"
+"
+"0","```r
+print(paste(round(memory_estimate/2^20, 1) ,\" \", \"mega byte\"))
+```"
+"1","[1] \"142.5   mega byte\"
+"

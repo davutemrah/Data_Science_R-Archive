@@ -1,0 +1,10 @@
+"0","qplot(x = enrollrate8, y = attainrate8,"
+"0","      data = df,"
+"0","          facets = . ~ factor(shangai), "
+"0","          geom = c(""point"", ""smooth""),"
+"0","          method = ""lm"")"
+"2","Warning:"
+"2"," Ignoring unknown parameters: method
+"
+"2","`geom_smooth()` using formula 'y ~ x'
+"

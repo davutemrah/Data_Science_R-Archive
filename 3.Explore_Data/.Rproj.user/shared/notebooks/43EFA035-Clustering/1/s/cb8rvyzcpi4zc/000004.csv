@@ -1,0 +1,5 @@
+"0","distancematrix <- dist(sub1[, c(10:12, maxCon)])"
+"0",""
+"0","hclustering <- hclust(distancematrix)"
+"0",""
+"0","myplclust(hclustering, lab.col = unclass(sub1$activity))"

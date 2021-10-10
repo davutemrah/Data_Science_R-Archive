@@ -1,0 +1,4 @@
+"0","x <- rnorm(10000)"
+"0","y <- rnorm(10000)"
+"0",""
+"0","smoothScatter(x, y)"

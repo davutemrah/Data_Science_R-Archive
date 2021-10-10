@@ -1,0 +1,12 @@
+"0","g + geom_point(aes(color = shangai),"
+"0","               size = 2,"
+"0","               alpha = 1) +"
+"0","    labs(title =""Countries"") +"
+"0","    labs(x = ""Enrollment rate"","
+"0","         y = ""Attainment Rate"") +"
+"0","    geom_smooth(size = 4, "
+"0","                linetype = 3,"
+"0","                method = ""lm"","
+"0","                se = F)"
+"2","`geom_smooth()` using formula 'y ~ x'
+"

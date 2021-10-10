@@ -1,0 +1,4 @@
+"0","svd1 <- svd(scale(dmordered))"
+"0",""
+"0","par(mfrow = c(1, 2))"
+"0","plot(svd1$d, xlab = ""Column"", ylab = ""Singular value"", pch = 19)"

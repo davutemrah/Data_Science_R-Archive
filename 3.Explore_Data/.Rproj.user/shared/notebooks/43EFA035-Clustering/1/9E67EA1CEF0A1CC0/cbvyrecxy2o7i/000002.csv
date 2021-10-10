@@ -1,0 +1,7 @@
+"0","set.seed(1234)"
+"0","dataMatrix <- as.matrix(df)[sample(1:12), ]"
+"0",""
+"0","kmeansobj <- kmeans(dataMatrix, centers = 3)"
+"0","par(mfrow = c(1, 2), mar = c(2, 4, 0.1, 0.1))"
+"0",""
+"0","image(t(dataMatrix)[, nrow(dataMatrix):1], yaxt = ""n"")"

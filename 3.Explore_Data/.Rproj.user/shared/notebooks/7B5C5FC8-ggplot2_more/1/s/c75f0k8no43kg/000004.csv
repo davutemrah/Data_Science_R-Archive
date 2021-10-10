@@ -1,0 +1,4 @@
+"0","g + geom_point()  + geom_smooth(method = ""lm"") +"
+"0","    facet_grid(. ~ shangai)"
+"2","`geom_smooth()` using formula 'y ~ x'
+"
