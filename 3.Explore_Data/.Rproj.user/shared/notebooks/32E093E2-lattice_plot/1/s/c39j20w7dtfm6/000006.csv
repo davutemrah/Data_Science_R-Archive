@@ -1,8 +1,0 @@
-"0","## custom panel function"
-"0",""
-"0","xyplot(y ~ x | f, panel = function(x, y, ...){"
-"0","    panel.xyplot(x, y, ...) # this is default panel function"
-"0","    "
-"0","     # add a simple regression line, "
-"0","    panel.lmline(x, y, col = 2)"
-"0","})"

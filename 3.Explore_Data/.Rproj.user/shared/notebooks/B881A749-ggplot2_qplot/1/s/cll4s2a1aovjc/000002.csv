@@ -1,3 +1,0 @@
-"0","qplot(x = displ, y = hwy, data = mpg, geom = c(""point"", ""smooth""))"
-"2","`geom_smooth()` using method = 'loess' and formula 'y ~ x'
-"

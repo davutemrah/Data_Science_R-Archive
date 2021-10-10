@@ -1,4 +1,0 @@
-"0","qplot(x = displ, y = hwy, data = mpg, color = drv) +"
-"0","    geom_smooth(method = ""lm"")"
-"2","`geom_smooth()` using formula 'y ~ x'
-"

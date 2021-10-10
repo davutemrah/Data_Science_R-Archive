@@ -1,2 +1,0 @@
-"0","par(mfrow = c(1, 4))"
-"0","image(t(approx1)[, nrow(approx1):1], main = ""(a)"")"

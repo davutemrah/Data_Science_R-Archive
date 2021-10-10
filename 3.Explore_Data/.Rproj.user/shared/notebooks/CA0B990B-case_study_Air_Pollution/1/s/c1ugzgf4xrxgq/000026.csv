@@ -1,2 +1,0 @@
-"0","par(mfrow = c(1, 2))"
-"0","with(merged, plot(rep(1999, 52), mean.x, xlim = c(1998, 2013)))"

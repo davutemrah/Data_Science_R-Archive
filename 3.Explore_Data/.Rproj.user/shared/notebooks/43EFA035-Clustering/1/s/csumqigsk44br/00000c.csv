@@ -1,2 +1,0 @@
-"0","legend(""bottomright"", legend = unique(sub1$activity),"
-"0","       col = unique(sub1$activity), pch = 1)"

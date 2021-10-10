@@ -1,4 +1,0 @@
-"0","# convert month to a factor variable"
-"0","airquality <- transform(airquality, Month = factor(Month))"
-"0",""
-"0","xyplot(Ozone ~ Wind | Month, data = airquality, layout = c(5, 1))"

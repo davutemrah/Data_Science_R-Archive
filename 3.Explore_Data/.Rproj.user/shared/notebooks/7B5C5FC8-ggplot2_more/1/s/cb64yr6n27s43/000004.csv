@@ -1,5 +1,0 @@
-"0","test <- tibble(x = 1:100, y = rnorm(100))"
-"0","# outlier created"
-"0","test[50, 2] <- 100"
-"0",""
-"0","plot(test$x, test$y, type = ""l"", ylim = c(-3, 3))"

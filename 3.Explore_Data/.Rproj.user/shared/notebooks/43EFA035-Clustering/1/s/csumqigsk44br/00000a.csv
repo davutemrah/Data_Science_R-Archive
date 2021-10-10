@@ -1,1 +1,0 @@
-"0","plot(sub1[, 2], col = sub1$activity, ylab = names(sub1)[2])"

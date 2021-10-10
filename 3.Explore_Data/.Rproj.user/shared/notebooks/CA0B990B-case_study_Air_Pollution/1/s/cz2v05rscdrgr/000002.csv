@@ -1,2 +1,0 @@
-"0","d1 <- data.frame(state = names(mean1), mean = mean1)"
-"0","head(d1)"

@@ -1,4 +1,0 @@
-"0","g + geom_point(aes(color = shangai),"
-"0","               size = 2,"
-"0","               alpha = 1) +"
-"0","    theme_bw(base_family = ""Times"")"

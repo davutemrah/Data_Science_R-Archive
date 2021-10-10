@@ -1,5 +1,0 @@
-"0","svd1 <- svd(scale(dmordered))"
-"0",""
-"0","par(mfrow = c(1, 3))"
-"0",""
-"0","image(t(dmordered)[, nrow(dmordered):1])"

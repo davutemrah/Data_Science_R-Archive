@@ -1,8 +1,0 @@
-"0","pm0 <- read.table(""data/pm25_data/RD_501_88101_1999-0.txt"", sep = ""|"","
-"0","           header = F, comment.char = ""#"", na.strings = """")"
-"0","dim(pm0)"
-"1","[1]"
-"1"," 117421"
-"1","     28"
-"1","
-"

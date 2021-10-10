@@ -1,3 +1,0 @@
-"0","graph1  <- xyplot(Ozone ~ Wind, data = airquality)  ## nothing shows up"
-"0",""
-"0","graph1"

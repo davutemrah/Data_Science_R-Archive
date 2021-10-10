@@ -1,5 +1,0 @@
-"0","library(lattice)"
-"0","library(datasets)"
-"0",""
-"0","# simple example"
-"0","xyplot(Ozone ~ Wind, data = airquality)"

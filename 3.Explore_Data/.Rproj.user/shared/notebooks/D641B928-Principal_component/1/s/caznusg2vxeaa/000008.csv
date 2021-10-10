@@ -1,2 +1,0 @@
-"0","plot(svd1$d^2/sum(svd1$d^2), xlab = ""Column"", ylab = ""Percent of variance explained"", pch = 19)"
-"0",""

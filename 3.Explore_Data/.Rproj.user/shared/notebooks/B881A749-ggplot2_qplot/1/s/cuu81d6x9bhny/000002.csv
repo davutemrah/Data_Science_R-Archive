@@ -1,1 +1,0 @@
-"0","qplot(x = hwy, data = mpg, facets = drv ~., binwidth = 2)"

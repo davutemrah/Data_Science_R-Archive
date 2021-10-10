@@ -1,7 +1,0 @@
-"0","x <- rnorm(12, mean = rep(1:3, each = 4), sd = 0.2)"
-"0","y <- rnorm(12, mean = rep(c(1, 2, 1), each = 4), sd = 0.2)"
-"0","df <- data.frame(x = x, y = y)"
-"0",""
-"0","set.seed(143)"
-"0","dataMatrix <- as.matrix(df)[sample(1:12), ]"
-"0","heatmap(dataMatrix)"

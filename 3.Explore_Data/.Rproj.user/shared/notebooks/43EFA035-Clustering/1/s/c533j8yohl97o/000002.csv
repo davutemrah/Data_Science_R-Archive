@@ -1,1 +1,0 @@
-"0","plot(kClust$centers[4, 1:10], pch = 19, ylab = ""Cluster Center"", xlab = """")"

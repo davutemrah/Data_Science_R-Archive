@@ -1,3 +1,0 @@
-"0","distxy <- dist(df)"
-"0","hClustering <- hclust(distxy)"
-"0","plot(hClustering)"

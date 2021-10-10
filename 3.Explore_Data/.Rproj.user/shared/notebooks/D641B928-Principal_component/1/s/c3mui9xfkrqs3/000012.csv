@@ -1,1 +1,0 @@
-"0","plot(svd1$v[, 1], xlab = ""Column"", ylab = ""First right singular vector"", pch = 19)"

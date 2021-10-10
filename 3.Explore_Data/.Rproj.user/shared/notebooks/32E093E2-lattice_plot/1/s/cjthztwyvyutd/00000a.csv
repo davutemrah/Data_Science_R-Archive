@@ -1,8 +1,0 @@
-"0","## custom panel function"
-"0",""
-"0","xyplot(y ~ x | f, panel = function(x, y, ...){"
-"0","    panel.xyplot(x, y, ...)"
-"0","     # add a horizontal line, "
-"0","    panel.abline(h = median(y), lty = 2)"
-"0","   "
-"0","})"
