@@ -1,0 +1,31 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## resampling
+
+```{r}
+library(UsingR)
+data(father.son)
+x = father.son$sheight
+B = 10000
+n = length(x)
+resamples <- matrix(sample(x, n*B, replace = T), B, n)
+medians <- apply(resamples, 1, median)
+sd(medians)
+```
+
+```{r}
+quantile(medians, c(.025, .975))
+```
+
+```{r}
+g = ggplot(as.data.frame(medians), aes(x=medians))
+g = g + geom_histogram(color = "black", fill = "lightblue", binwidth = 0.05)
+g
+
+```
+
+
+

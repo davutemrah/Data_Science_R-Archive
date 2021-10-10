@@ -1,0 +1,89 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## multiple testing
+
+we test a lot and calculate many pvalues. Everytime we estimate p values, chance of false positives increase
+
+there ways to adjust pvalues.
+
+```{r}
+set.seed(1010093)
+pvalues <- rep(NA, 1000)
+
+for(i in 1:1000){
+    y = rnorm(20)
+    x = rnorm(20)
+    pvalues[i] <- summary(lm(y ~ x))$coeff[2, 4]
+}
+
+# controls false positive rate
+sum(pvalues < 0.05)
+```
+
+ even there is no relationship, 5 % false positives,
+ 
+
+## 1 bonferoni
+
+```{r}
+sum(p.adjust(pvalues, method = "bonferroni") < 0.05)
+```
+ 
+0 false positive
+
+## 2 FDR
+
+```{r}
+sum(p.adjust(pvalues, method = "BH") < 0.05)
+```
+
+```{r}
+
+```
+
+### case II: 50% true positive
+
+```{r}
+set.seed(1010093)
+pvalues <- rep(NA, 1000)
+
+for(i in 1:1000){
+    x = rnorm(20)
+    
+    #first 500 beta = 0, last = 500 beta =2
+    if(i <= 500) {y = rnorm(20)} else {y <- rnorm(20, mean = 2*x)}
+    
+    pvalues[i] <- summary(lm(y ~ x))$coeff[2, 4]
+}
+
+truestatus  = rep(c("zero", "not zero"), each = 500)
+table(pvalues < 0.05, truestatus)
+```
+
+
+## 1 bonferoni
+
+```{r}
+table(p.adjust(pvalues, method = "bonferroni") < 0.05, truestatus)
+```
+
+
+## 2 bonferoni
+
+```{r}
+table(p.adjust(pvalues, method = "BH") < 0.05, truestatus)
+```
+
+
+```{r}
+par(mfrow = c(1, 2))
+plot(pvalues, p.adjust(pvalues, method = "bonferroni"), pch = 19)
+plot(pvalues, p.adjust(pvalues, method = "BH"), pch = 19)
+
+```
+
+
+

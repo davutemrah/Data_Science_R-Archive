@@ -1,0 +1,130 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## quiz
+
+Question 1
+A pharmaceutical company is interested in testing a potential blood pressure lowering medication. Their first examination considers only subjects that received the medication at baseline then two weeks later. The data are as follows (SBP in mmHg)
+
+x1 = c(140, 138, 150, 148, 135)
+x2 = c(132, 135, 151, 146, 130) 
+
+Consider testing the hypothesis that there was a mean reduction in blood pressure? Give the P-value for the associated two sided T test. 
+
+(Hint, consider that the observations are paired.)
+
+```{r}
+x1 = c(140, 138, 150, 148, 135)
+x2 = c(132, 135, 151, 146, 130) 
+dif = (x2) - (x1)
+meandif = mean(dif)
+sddif = sd(dif)
+tstat = (mean(dif)-0)/(sd(dif)/sqrt(5))
+
+onesided_pvalue = pt(tstat, df = 4, lower.tail = T)
+onesided_pvalue
+twosided_pvalue = 2*pt(tstat, df = 4, lower.tail = T)
+twosided_pvalue
+```
+
+```{r}
+t.test(x1, x2, paired = T, alternative = "two.sided")
+```
+
+Question 2
+A sample of 9 men yielded a sample average brain volume of 1,100cc and a standard deviation of 30cc. What is the complete set of values of \mu0 that a test of H0   would fail to reject the null hypothesis in a two sided 5% Students t-test?
+
+```{r}
+tquantile = qt(.975, 8)
+tquantile
+```
+
+-2.3 < 1100-MU) / (sd / sqrt(n))   < 2.3
+
+```{r}
+
+```
+
+3.
+Question 3
+Researchers conducted a blind taste test of Coke versus Pepsi. Each of four people was asked which of two blinded drinks given in random order that they preferred. The data was such that 3 of the 4 people chose Coke. Assuming that this sample is representative, report a P-value for a test of the hypothesis that Coke is preferred to Pepsi using a one sided exact test.
+
+
+```{r}
+pbinom(q=2, size=4, prob = 0.5, lower.tail = F )
+```
+
+
+Question 4
+Infection rates at a hospital above 1 infection per 100 person days at risk are believed to be too high and are used as a benchmark. A hospital that had previously been above the benchmark recently had 10 infections over the last 1,787 person days at risk. About what is the one sided P-value for the relevant test of whether the hospital is *below* the standard? 
+
+```{r}
+lambda = 1787 * 0.01
+ppois(10, lambda = lambda, lower.tail = T)
+```
+
+
+Question 5
+Suppose that 18 obese subjects were randomized, 9 each, to a new diet pill and a placebo. Subjects’ body mass indices (BMIs) were measured at a baseline and again after having received the treatment or placebo for four weeks. The average difference from follow-up to the baseline (followup - baseline) was −3 kg/m2 for the treated group and 1 kg/m2 for the placebo group. The corresponding standard deviations of the differences was 1.5 kg/m2 for the treatment group and 1.8 kg/m2 for the placebo group. Does the change in BMI appear to differ between the treated and placebo groups?  Assuming normality of the underlying data and a common population variance, give a pvalue for a two sided t test.
+
+
+```{r}
+meanDifT = -3
+meanDifC = 1
+sdT = 1.5
+sdC = 1.8
+df = 18-2
+pooledSd = sqrt((8*sdT^2 + 8*sdC^2)/16)
+
+testStat = (meanDifT-meanDifC)/(pooledSd*sqrt(2/9))
+
+2*pt(testStat, 16, lower.tail = T)
+```
+
+## Question 7
+Researchers would like to conduct a study of 100 healthy adults to detect a four year mean brain volume loss of   .01 .Assume that the standard  deviation of four year volume loss in this population is  .04 mm^3. About what would be the power of the study for a 5% one sided test versus a null hypothesis of no volume loss?
+
+```{r}
+mu0 = 0
+mua = 0.01
+sigma = 0.04
+n = 100
+alpha = 0.05
+
+z <- qnorm(1 - alpha)
+
+pnorm(mu0 + z*sigma/sqrt(n), mean = mua, sd = sigma/sqrt(n), lower.tail = FALSE)
+```
+
+
+## Question 8
+Researchers would like to conduct a study of  n healthy adults to detect a four year mean brain volume loss of   0.01 mm. Assume that the standard deviation of four year volume loss in this population is 0.04 mm. About what would be the value of  n needed for 90% power of type one error rate of 5% one sided test versus a null hypothesis of no volume loss?
+
+```{r}
+mu0 = 0
+mua = 0.01
+sigma = 0.04
+n = NA
+alpha = 0.05
+
+power = 0.90
+
+z <- qnorm(1 - alpha)
+
+zquant = qnorm(p = 0.90, mean = mua, sd = sigma/sqrt(n), lower.tail = FALSE)
+zquant
+```
+
+
+```{r}
+n = (z*sigma/ (zquant - mu0))
+n^2
+```
+
+Question 9
+As you increase the type one error rate,  \alpha α, what happens to power?
+
+you will get more power.
+

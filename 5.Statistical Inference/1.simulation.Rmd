@@ -1,0 +1,353 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+### Exampple 1
+
+```{r}
+set.seed(1234)
+nosim = 1000
+n = 10
+
+x = rnorm(nosim * n)  # 10 000 standart normal number
+
+mat = matrix(x, nosim) # 1000 x 10 matrix, just tellin number of rows
+
+x_bar = apply(mat, 1, mean) # row mean
+
+sd(x_bar)
+```
+standart error (deviation) of sample means
+
+```{r}
+1/sqrt(10)
+```
+
+
+
+### Example 2
+
+```{r}
+nosim = 1000
+n = 10
+
+x <- runif(nosim * 10)
+
+mat = matrix(x, nosim) # 1000 x 10
+
+means_of_1000_samples = apply(mat, 1, mean)
+
+sd(means_of_1000_samples)
+```
+
+```{r}
+# var(x) = 1/12
+1 / sqrt(12 * n)
+```
+
+## example 3
+
+poisson: sample size= 10; variance lambda=4
+```{r}
+nosim = 1000
+n = 10
+
+x = rpois(nosim*n, 4)
+
+mat = matrix(x, nosim)
+
+means_of_1000_samples = apply(mat, 1, mean)
+
+sd(means_of_1000_samples)
+```
+
+sd(xbar) = s(x) / sqrt(n)
+
+```{r}
+2/sqrt(n)
+```
+
+### example 
+
+fair coin flips: sd = 0.5, var = 0.25, sd of means of random samples of n = 1/(2*sqrt(n))
+
+```{r}
+nosim = 1000
+n = 10
+
+x = sample(0:1, nosim*n, replace = T)
+
+mat = matrix(x, nosim)
+
+means_of_1000_samples = apply(mat, 1, mean)
+
+sd(means_of_1000_samples)
+```
+
+```{r}
+1 / (2*sqrt(10))
+```
+
+### example
+
+```{r}
+library(UsingR)
+
+data(father.son)
+
+x = father.son$sheight
+n = length(x) 
+```
+
+```{r}
+qplot(x)
+```
+
+```{r}
+round(c(var(x), var(x)/n, sd(x), sd(x)/sqrt(n)), 
+      digits = 2)
+```
+
+## binomial
+
+```{r}
+choose(8, 7)*0.5^8 + choose(8, 8)*0.5^8
+```
+
+```{r}
+pbinom(6, size = 8, prob = 0.5, lower.tail = F)
+```
+
+# Normal distribution
+
+```{r}
+mu = 0
+sd = 1
+qnorm(.95, mean = mu, sd = sd)
+```
+
+```{r}
+z = 2
+mu = 0
+sd = 1
+
+pnorm(1.96, mu, sd, lower.tail = F)
+```
+
+```{r}
+qnorm(0.75, mean = 1020, sd = 50)
+```
+
+### Poisson
+
+```{r}
+ppois(3, lambda = 2.5*4)
+```
+
+## Poisson approximation to Binomial distribution
+
+flip a coin, success 0.01, n=500
+```{r}
+pbinom(2, size = 500, prob = 0.01)
+
+```
+
+```{r}
+ppois(2, lambda = 500*0.01)
+```
+
+## Law of Large Numbers
+
+```{r}
+n = 1000
+
+means = cumsum(rnorm(n))/(1:n)
+
+qplot(x = 1:n, y = means)
+```
+
+```{r}
+means = cumsum(sample(0:1, n, replace = T))/(1:n)
+
+plot(x = 1:n, y = means) 
+abline(h=0.5)
+```
+
+## Asymptotics and CLT
+
+simulate a standard normal random variable by rolling n six sided die
+
+
+```{r}
+n = 1000
+nosim = 10000
+x = sample(1:6, n*nosim, replace = T)
+
+mat = matrix(x, nosim)
+
+means = apply(mat, 1, mean)
+m = means
+mu = 3.5 # sample averages converges to
+se = 1.71/sqrt(n) # standar error of sample averages converges to
+
+for (i in 1:nosim ){
+   m[i] <- (means[i] - mu)/(se)
+}
+qplot(m)
+```
+## coin
+
+```{r}
+
+n = 10
+nosim = 10000
+x = sample(0:1, n*nosim, replace = T)
+
+mat = matrix(x, nosim)
+
+means = apply(mat, 1, mean)
+st = means
+mu = 0.5 # sample averages converges to
+se = 0.5/sqrt(n) # standart error of sample averages converges to
+
+for (i in 1:nosim ){
+   st[i] <- (means[i] - mu)/(se)
+}
+qplot(st)
+```
+
+## Confidence Intervals
+
+```{r}
+library(UsingR)
+data("father.son")
+# 12 is for inch conversion
+x = father.son$sheight
+(mean(x) + c(-1, 1)*qnorm(0.975)*sd(x)/sqrt(length(x)))/12
+
+```
+
+
+## binomial interval
+
+```{r}
+p = 56/100
+q = 44/100
+
+p + c(-1, 1)*qnorm(0.975)*sqrt(p * q / 100)
+```
+
+```{r}
+binom.test(56, 100)$conf.int
+```
+
+## simulation
+
+```{r}
+n = 20
+
+pvals = seq(0.1, 0.9, by = 0.05)
+
+nosim = 10000
+
+coverage <- sapply(pvals, function(p){
+    phats = rbinom(nosim, prob = p, size = n)/n
+    l1 = phats - qnorm(0.975)*sqrt(phats * (1-phats)/n)
+    ul = phats + qnorm(0.975)*sqrt(phats * (1-phats)/n)
+    mean(l1 < p & ul > p)
+})
+
+qplot(y= coverage, x=pvals) + ylim(0.75, 1)
+```
+
+```{r}
+n = 100
+
+pvals = seq(0.1, 0.9, by = 0.05)
+
+nosim = 10000
+
+coverage <- sapply(pvals, function(p){
+    phats = rbinom(nosim, prob = p, size = n)/n
+    l1 = phats - qnorm(0.975)*sqrt(phats * (1-phats)/n)
+    ul = phats + qnorm(0.975)*sqrt(phats * (1-phats)/n)
+    mean(l1 < p & ul > p)
+})
+
+qplot(y= coverage, x=pvals) + ylim(0.75, 1)
+```
+
+## add 2 succes and failure
+
+```{r}
+
+n = 20
+
+pvals = seq(0.1, 0.9, by = 0.05)
+
+nosim = 10000
+
+coverage <- sapply(pvals, function(p){
+    phats = (rbinom(nosim, prob = p, size = n) + 2)/(n+4)
+    l1 = phats - qnorm(0.975)*sqrt(phats * (1-phats)/n)
+    ul = phats + qnorm(0.975)*sqrt(phats * (1-phats)/n)
+    mean(l1 < p & ul > p)
+})
+
+qplot(y= coverage, x=pvals) + ylim(0.75, 1)
+```
+
+### Poisson
+
+```{r}
+# nuclear pump failed 5 times in 94.32 days 
+# estimate lambda = x/t
+# var(lambda) = lambda/t
+x = 5
+t = 94.32
+lambda = x/t
+round(lambda + c(-1, 1)*qnorm(0.975)*sqrt(lambda/t), digits = 3)
+
+```
+
+```{r}
+poisson.test(x, T = 94.32)$conf
+```
+
+for fairly small lambda, we have very bad asymptotics
+
+```{r}
+lambdavals = seq(0.005, 0.1, by = 0.01)
+nosim = 1000
+t = 100
+
+coverage <- sapply(lambdavals, function(lambda){
+    lhats = rpois(nosim, lambda = lambda*t)/t
+    ll = lhats - qnorm(0.975)*sqrt(lhats/t)
+    ul = lhats + qnorm(0.975)*sqrt(lhats/t)
+    mean(ll < lambda & ul > lambda)
+})
+
+qplot(y= coverage, x=lambdavals) + ylim(0.5, 1)
+
+```
+
+
+```{r}
+lambdavals = seq(0.005, 0.1, by = 0.01)
+nosim = 1000
+t = 1000
+
+coverage <- sapply(lambdavals, function(lambda){
+    lhats = rpois(nosim, lambda = lambda*t)/t
+    ll = lhats - qnorm(0.975)*sqrt(lhats/t)
+    ul = lhats + qnorm(0.975)*sqrt(lhats/t)
+    mean(ll < lambda & ul > lambda)
+})
+
+qplot(y= coverage, x=lambdavals) + ylim(0.5, 1)
+
+```
+
+
