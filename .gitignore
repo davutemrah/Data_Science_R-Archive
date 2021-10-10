@@ -2,9 +2,10 @@
 .Rhistory
 .Rapp.history
 # Session Data files
+*Rproj
 .RData
 .gitattributes
-.Rhistory
+*.Rhistory
 # Example code in package build process
 *-Ex.R
 # Output files from R CMD build
