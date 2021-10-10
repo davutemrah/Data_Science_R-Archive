@@ -1,0 +1,127 @@
+---
+title: "Knitr Package"
+author: "dea"
+date: "8/21/2021"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Setting Global Options
+
+This is expected to be at the top
+
+```{r setoptions, echo=FALSE}
+# opts_chunk$set(echo = FALSE, results = "hide")
+```
+
+### Notebook vs Rmarkdown
+
+* They can create same outputs  
+* Use same syntax  
+* For output in Notebook, you need to run all chunks of codes to appear in the output  
+* In Rmarkdown, when you knit, automatically it runs all the code and produce the output.
+
+
+My First knitr Document
+=============================================
+
+This is some text
+
+Here is a code chunk
+```{r}
+set.seed(1234)
+x = rnorm(100)
+mean(x)
+```
+
+### More Complicated Way
+
+```
+library(knitr)
+setwd(getwd())
+knit2html("document.Rmd")
+browseURL("document.html")
+```
+
+# Another Example
+
+## Intro
+
+```{r firstchunk, echo=FALSE, results='hide'}
+x = rnorm(100)
+summary(x)
+```
+R objects can be used as macros in the text
+
+```{r}
+x = Sys.time()
+y = mean(rnorm(100))
+
+format(x, "%Y-%m-%d, %a")
+```
+
+System time is `r x`. My favorite number is `r y`.
+
+### incorporate Graphics
+
+```{r scatterplot, fig.height=4}
+x = rnorm(100); y = x +rnorm(100, sd = 0.5)
+
+par(mar = c(5, 4, 1, 1), las = 1)
+plot(x, y, main = "My Simulated Data")
+```
+
+### Making Tables with xtable package  
+
+```{r fitmodel}
+data("airquality")
+
+fit = lm(Ozone ~ Wind + Temp + Solar.R, data = airquality)
+
+summary(fit)
+```
+
+Making a table of regression coefficients
+
+```{r showtable, results='asis'}
+library(xtable)
+xt = xtable(summary(fit))
+
+```
+
+For pdf output
+
+```{r showtable1}
+print(xt, type = "latex")
+```
+
+Html format
+```{r showtable2}
+print(xt, type = "html")
+```
+
+
+
+`results`: "asis", "hide"
+`echo`: TRUE / FALSE
+`fig.height`: numeric
+`fig.width`: numeric
+
+**important tip**  
+Some code chunks take forever to run. You do not have to run it every time.
+
+`cache=TRUE`
+
+
+
+
+
+
+

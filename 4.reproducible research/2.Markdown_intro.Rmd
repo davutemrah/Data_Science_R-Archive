@@ -1,0 +1,103 @@
+---
+title: "Reproducible Research"
+output:
+  html_document:
+    df_print: paged
+---
+
+### Coding Standards
+
+* Use text files/editors
+
+* Indent your code (easier to read)
+    * you can increase more
+    * Rstudio/Preferences/code tab 4
+    
+* limit the width of your code (80 columns ?)
+    * Rstudio/Preferences/code display 80
+    
+* limit the size of individual functions
+    * split functions so that they execute simple steps
+    * you can easily debug
+
+### Markdown
+
+Markdown is a text-to-HTML conversion tool for web writers. It is a simplified version of "markup" languages. John Gruber, creator of Markdown.
+
+#### Markdown Syntax
+
+* *Italics*: \*---\*
+* **Bold** : \*\*---\*\*
+
+# Heading1 
+## Heading2
+### Heading3
+#### Heading4
+##### Heading5
+###### Heading6
+
+#### Unordered Lists
+* One star
+* Hyphen 
+    - Indent 
+        - Indent2
+
+
+#### Ordered Lists
+As long as they start with number, markdown will automatically order the items according to location.
+
+1. First Item
+2. Third Item
+    a. Indent1
+3. Second Item
+
+#### Links
+
+**Type-1**
+
+[mywebsite](https://davutemrah.github.io)  
+--> [mywebsite](https://davutemrah.github.io)
+    
+**Type-2**
+
+[google][1] search engine and [Github Markdown][2] to learn more about Markdown
+
+[1]: http://www.google.com
+[2]: https://guides.github.com/features/mastering-markdown/
+
+#### New Line
+
+Newlines require a double space after the end of a line.
+    
+#### R Markdown
+
+* R Markdown is the integration of R code with markdown. Live code is contained in the document. R code is  evaluated and results are inserted during the process.  
+* R markdown can be converted to markdown using **knitr** package in R. Then markdown can be converted to HTML using the markdown package in R.  
+* Slides of coursera are written in R markdown and converted to slides using **slidify** package.
+
+
+#### box
+
+    Different format goes here.
+
+### Math
+
+Within single dollar sign
+$Y_i = \alpha + \beta_1X_i + \beta_2X_i + \epsilon$
+
+Within double dollar sign
+$$Y_i = \alpha + \beta_1X_i + \beta_2X_i + \epsilon$$
+
+
+    
+
+
+
+
+
+
+
+
+
+
+

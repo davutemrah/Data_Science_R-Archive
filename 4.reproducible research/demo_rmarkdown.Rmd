@@ -1,0 +1,30 @@
+ my first R Markdown File  
+===========================
+ 
+ This is my first Rmarkdown file (in this different style, indeed). Main difference is that I don't run the codes but I just knit the file. So you don't see the results here, but they will show up in the output file.
+ 
+### Here goes the data
+ 
+ ```{r}
+ library(datasets)
+ data(airquality)
+ summary(airquality)
+ ```
+ 
+Let's first make a pairs plot of the data.
+ 
+ ```{r}
+ pairs(airquality)
+ ```
+ 
+ Here is a regression model
+ ```{r}
+ library(stats)
+ fit <- lm(Ozone ~ Wind + Solar.R + Temp, data = airquality)
+ summary(fit)
+ ```
+ 
+Here is an unordered lists  
+* list1  
+* list2
+ 

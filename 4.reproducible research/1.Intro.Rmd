@@ -1,0 +1,279 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+knitr is a helpful package
+
+it brings together many features added onto Sweave
+
+knitr uses R as the programming language but integrates Latex, Markdown, HTML
+
+knitr was developed by Yihui Xie, while a graduate student
+
+Defining the Ideal Data Set
+
+* Descriptive: a whole population
+* Exploratory: A rondom sample with many variables
+* Inferential: the right population, randomly sampled
+* predictive: a training and test data set from the same population
+* causal: data from a randomized study
+* Mechanistic: data about the components of the system
+
+# data centers
+* Google Data Centers
+* UCI Machine Learning Repository
+
+# Steps in a data analysis
+1. define the question
+2. define the ideal data set
+3. determine what data youo can access
+4. obtain data
+5. clean data
+6. Exploratory data analysis
+7. Statistical modeling
+8. interpret results
+9. challenge results
+10. Write up results
+11 create reproducible code
+
+
+```{r}
+# If not installed, install kernlab package
+library(kernlab)
+data(spam)
+dim(spam)
+str(spam[, 1:10])
+```
+
+we need to generate a test and training set (prediction)
+```{r}
+set.seed(3435)
+train_indicator <- 
+    rbinom(n = 4601, size=1, prob = 0.5)
+table(train_indicator)
+```
+
+```{r}
+trainspam = spam[train_indicator==1, ]
+testspam = spam[train_indicator==0, ]
+```
+
+### Exploratory Data Analysis
+
+- look at summaries of the data
+- check for missing data
+- create exploratory plots
+- perform exploratory analyses (e.g. clustering)
+- one/two dimensional relations
+
+```{r}
+names(trainspam)[1:5]
+```
+```{r}
+head(trainspam)
+```
+
+```{r}
+table(trainspam$type)
+```
+
+```{r, fig.height=2}
+plot(trainspam$capitalAve ~ trainspam$type)
+```
+
+Data looks highly skewed, so log transformation is useful. Since there are a lot of 0 in the data, and we are just exploring the data, adding 1 makes sense. Normally we would not do.
+
+```{r,fig.height=2}
+plot(log10(trainspam$capitalAve + 1) ~ trainspam$type)
+```
+
+## Pairwise Relationships
+
+```{r, fig.height=2.5, fig.width=2.5}
+plot((log10(trainspam[, 1:4] + 1)))
+
+plot(log10(trainspam[, 1:4]))
+```
+
+## Clustering
+
+clustering is highly sensitive to skewness of the distribution
+
+```{r, fig.height=2.5}
+hCluster <- hclust(dist(t(trainspam[, 1:57])))
+
+plot(hCluster)
+```
+
+Here we do log transformation
+
+```{r, fig.height=2.5}
+hCluster2 <- hclust(dist(t(log10(trainspam[, 1:55] + 1)))) 
+
+plot(hCluster2)
+```
+
+## Statistical prediction/modeling
+
+```{r}
+trainspam$numtype = as.numeric(trainspam$type) - 1
+costfunction <- function(x, y) {sum(x != (y > 0.5))}
+cverror <- rep(NA, 55)
+```
+
+reformulate creates a formula from a character vector. 
+
+response: left hand side of the formula
+```{r, include=FALSE}
+library(boot) 
+for(i in 1:55) {
+    lmformula = reformulate(names(trainspam)[i], response = "numtype")
+    glmfit = glm(lmformula, family = "binomial", data = trainspam)
+    cverror[i] = cv.glm(trainspam, glmfit, costfunction, 2)$delta[2]
+}
+```
+
+Cross-validation for Generalized Linear Models
+cv.glm()
+
+This function calculates the estimated K-fold cross-validation prediction error for generalized linear models.
+
+```{r}
+## Which predictor has minimum cross-validated error?
+names(trainspam)[which.min(cverror)]
+```
+
+## Get a measure of uncertainty
+
+```{r}
+## use th best model from the group
+predictmodel = glm(numtype ~ charDollar, family = "binomial",
+                   data = trainspam)
+
+## get predictions on the test set
+predictionTest = predict(predictmodel, testspam)
+predictedSpam = rep("nonspam", dim(testspam)[1])
+
+## classify as 'spam' for those with prob > 0.5
+predictedSpam[predictmodel$fitted > 0.5] = "spam"
+
+predictedSpam2 = rep("nonspam", dim(testspam)[1])
+predictedSpam2[predictmodel$fitted > 0.8] = "spam"
+```
+
+```{r}
+## classification table
+table(predictedSpam, testspam$type)
+
+table(predictedSpam2, testspam$type)
+```
+
+```{r}
+## error rate 
+
+(61 + 458)/(1346 + 458 + 61 + 449)
+```
+
+### this example
+
+- fraction of characters that are dollar signs can be used to predict if an email is a SPAM
+
+- anything with more than 6.6% dollar signs is classified as Spam
+
+- more dollar signs always means more spam under our prediction
+
+- our test set error rate is 22.4%
+
+### challange results
+
+Before anybody does, challenge yourself
+Challenge all steps:
+    * question
+    * data source
+    * processing
+    * analysis
+    * conclusion
+
+- challenge measures of uncertainty
+- challenge choices of terms to include in models
+- think of potential alternative analyses
+
+### Synthesize/write-up results
+
+* lead the question (what data, what methodology is appropriate)
+* summarize the analysis into the story
+* dont include every analysis
+* include:
+    - if it is needed for the story
+    - if it is needed to address a challenge
+* order analyses according to the story, rather than chronologically
+* include "pretty" figures that contribute to the story
+
+#### In this example
+
+* lead the question:
+    - can I use quantitative characteristics of the emails to classify them as SPAM/HAM ?
+    
+* Describe the approach
+    - collected data from UCI -> created training and test sets
+    - explored relationships
+    - choose logistic model on training set by cross validation
+    - Applied to test data and get 78% accuracy
+* interpret results
+    - number of dollar signs seems reasonable, e.g. "make money with viagra "\$ \$ \$"
+
+* challenge results    
+    - 78% is not that great
+    - I could use more variables
+    - why logistic regression?
+
+
+## Organizing Analysis
+
+* Data:
+    - raw data
+    - processed data
+* Figures:
+    - Exploratory figures
+    - final figures
+* R code:
+    - raw/unused scripts
+    - final scripts
+    - R markdown
+* Text
+    - readme files
+    - text of analysis/report
+    
+
+**Exploratory Figures
+- They usually will not be part of the final report
+- They should be useful but do not have to be polished
+
+** Final Figures
+- usually small subset of original figures
+- axes/colors set to make the figure clear
+- possibly multiple panels
+
+** Raw scripts
+- less comments
+- multiple versions
+- some may be discarded in final
+
+**Final scripts
+- clearly commented
+- include processing details
+- only analyses that appear in the final write-up
+
+** Readme file
+- if you use Rmarkdown, not necessary
+- should contain all steps to replicate the analysis
+
+** Text of the document
+- it should include a title, introduction (motivation), methods, results (includes measures of uncertainty), conclusions (including potential problems)
+- it should tell a story
+- it should not include every analysis you performed
+- references should be included for statistical methods
+    
+
+

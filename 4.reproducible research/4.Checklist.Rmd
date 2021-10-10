@@ -1,0 +1,81 @@
+---
+title: "R Notebook"
+output: html_notebook
+
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_dir = "html_output") })
+---
+
+### Reproducible Research DOs and DONTs
+1. DOs
+garbage in garbage out
+Coherent, focused question
+good collaborators
+interesting topic
+keep software, package track of versions
+
+### Use version control system
+* software like Github, Bitbucket, SourceForge to publish results
+* it will slow things down
+* add small changes each time
+* track snapshots or revert to old
+*
+
+
+2. DON'Ts
+dont do hand editing
+downloading data from web by clicking the links
+dont use point and click software
+
+
+```{r}
+url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/00275/Bike-Sharing-Dataseet.zip"
+
+download.file(url, destfile = "data.zip")
+```
+
+### Advantages
+* you have the specific url
+* downloaeded to local machine
+* file name
+* location is specific
+
+### Important: Dont save output alone
+
+* It is important that keep output only with code. Otherwise, you will have outputs that may not be reproducible
+
+* Every intermediate file should be documented
+
+### DO: Think about the entire pipeline
+
+* Data analysis is lengthy process; it is not just tables, figures, reports
+
+* Raw data ---> processed data ---> analysis ---> report
+
+* How you got to the end is as important as the end itself
+
+### The `cacher` package for R
+
+
+### Simple Analysis
+
+```{r}
+library(datasets)
+library(stats)
+```
+
+```{r}
+data("airquality")
+```
+```{r}
+fit <- lm(Ozone ~ Wind + Temp + Solar.R, 
+          data = airquality)
+summary(fit)
+```
+
+```{r, fig.height=4, fig.width=4}
+par(mfrow = c(2, 2))
+plot(fit)
+```
+
+

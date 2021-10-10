@@ -1,0 +1,141 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+The Effect of Weather on the Health of the Population and the Economy
+Arsh Singh
+
+8/14/2021
+
+Synopsis
+This analysis looks at the effect different weather types have on the population’s health and property damage. For this analysis, the U.S. National Oceanic and Atmospheric Administration’s (NOAA) storm database was used to access the data. Analyzing the database required looking at the fatalities, injuries, event type, property damage, crop damage, and the value of money associated with the property and crop damage. Using these values from the database, the top 10 deadliest, dangerous, and damaging weather types were calculated and graphed.
+
+Data Processing
+The data is loaded.
+
+library(ggplot2)
+StormFile <- read.csv("repdata_data_StormData.csv.bz2")
+StormData <- StormFile[c("FATALITIES","EVTYPE", "INJURIES", "PROPDMG", "PROPDMGEXP","CROPDMG", "CROPDMGEXP")]
+StormData$event_cat <- ''
+Here, the data is being cleaned. Similar weather types are combined into one name for simplicity. Also, alternate names for the same weather type are also combined into one name for simplicity. The new, simple names with the combined numbers are added into a new column, event_cat, for easy access.
+
+StormData$event_cat[grepl('VOLCAN|VOG',StormData$EVTYPE, ignore.case = TRUE)] <- 'VOLCANO'
+StormData$event_cat[grepl('TORNADO|TORNDAO',StormData$EVTYPE, ignore.case = TRUE)] <- 'TORNADO'
+StormData$event_cat[grepl('HAIL|SLEET|ICE',StormData$EVTYPE, ignore.case = TRUE)] <- 'HAIL'
+StormData$event_cat[grepl('TSTM|THUNDERSTORM',StormData$EVTYPE, ignore.case = TRUE)] <- 'THUNDERSTORM'
+StormData$event_cat[grepl('RAIN|PRECIP|SHOWER',StormData$EVTYPE, ignore.case = TRUE)] <- 'RAIN'
+StormData$event_cat[grepl('FLOOD|FLD|FLOOOD|DROWNING|RAPIDLY RISING WATER',StormData$EVTYPE, ignore.case = TRUE)] <- 'FLOOD'
+StormData$event_cat[grepl('WIND|WND',StormData$EVTYPE, ignore.case = TRUE)] <- 'WIND'
+StormData$event_cat[grepl('LIGHTNING|LIGNTNING|LIGHTING',StormData$EVTYPE, ignore.case = TRUE)] <- 'LIGHTNING'
+StormData$event_cat[grepl('SNOW|COLD|FREEZE|BLIZZARD|WINT|LOW TEMP|ICY|HYPOTHERMIA|FREEZ|FROST|COOL',StormData$EVTYPE, ignore.case = TRUE)] <- 'SNOW'
+StormData$event_cat[grepl('TIDE',StormData$EVTYPE, ignore.case = TRUE)] <- 'TIDE'
+StormData$event_cat[grepl('HEAT|HOT|HIGH|RECORD|WARMTH|WARM|HIGH TEMP|HYPER|DRI',StormData$EVTYPE, ignore.case = TRUE)] <- 'HEAT'
+StormData$event_cat[grepl('UNSEASONABLY',StormData$EVTYPE, ignore.case = TRUE)] <- 'UNSEASONABLY'
+StormData$event_cat[grepl('HURRICANE',StormData$EVTYPE, ignore.case = TRUE)] <- 'HURRICANE'
+StormData$event_cat[grepl('FOG',StormData$EVTYPE, ignore.case = TRUE)] <- 'FOG'
+StormData$event_cat[grepl('CURRENT',StormData$EVTYPE, ignore.case = TRUE)] <- 'CURRENT'
+StormData$event_cat[grepl('DRY|DROUGHT',StormData$EVTYPE, ignore.case = TRUE)] <- 'DROUGHT'
+StormData$event_cat[grepl('FIRE|SMOKE',StormData$EVTYPE, ignore.case = TRUE)] <- 'FIRE'
+StormData$event_cat[grepl('Summary',StormData$EVTYPE, ignore.case = TRUE)] <- 'Summary'
+StormData$event_cat[grepl('WET',StormData$EVTYPE, ignore.case = TRUE)] <- 'WET'
+StormData$event_cat[grepl('SLIDE',StormData$EVTYPE, ignore.case = TRUE)] <- 'MUDSLIDE'
+StormData$event_cat[grepl('SURF',StormData$EVTYPE, ignore.case = TRUE)] <- 'SURF'
+StormData$event_cat[grepl('SWELLS',StormData$EVTYPE, ignore.case = TRUE)] <- 'SWELLS'
+StormData$event_cat[grepl('Landslump',StormData$EVTYPE, ignore.case = TRUE)] <- 'Landslump'
+StormData$event_cat[grepl('Summary',StormData$EVTYPE, ignore.case = TRUE)] <- 'Summary'
+StormData$event_cat[grepl('CLOUD|FUNNEL|GUSTNAD',StormData$EVTYPE, ignore.case = TRUE)] <- 'CLOUD'
+StormData$event_cat[grepl('URBAN',StormData$EVTYPE, ignore.case = TRUE)] <- 'URBAN'
+StormData$event_cat[grepl('AVALANCHE|AVALANCE',StormData$EVTYPE, ignore.case = TRUE)] <- 'AVALANCHE'
+StormData$event_cat[grepl('WATERSPOUT|WAYTER|WATER SPOUT',StormData$EVTYPE, ignore.case = TRUE)] <- 'WATERSPOUT'
+StormData$event_cat[grepl('GLAZE',StormData$EVTYPE, ignore.case = TRUE)] <- 'GLAZE'
+StormData$event_cat[grepl('SMOKE',StormData$EVTYPE, ignore.case = TRUE)] <- 'SMOKE'
+StormData$event_cat[grepl('DUST',StormData$EVTYPE, ignore.case = TRUE)] <- 'DUST STORM'
+StormData$event_cat[grepl('TURBULENCE',StormData$EVTYPE, ignore.case = TRUE)] <- 'TURBULENCE'
+StormData$event_cat[grepl('TROPICAL|COASTAL',StormData$EVTYPE, ignore.case = TRUE)] <- 'TROPICAL STORM'
+StormData$event_cat[grepl('NORTHERN LIGHTS',StormData$EVTYPE, ignore.case = TRUE)] <- 'NORTHERN LIGHTS'
+StormData$event_cat[grepl('MIX',StormData$EVTYPE, ignore.case = TRUE)] <- 'MIX'
+StormData$event_cat[grepl('OTHER',StormData$EVTYPE, ignore.case = TRUE)] <- 'OTHER'
+StormData$event_cat[grepl('TYPHOON',StormData$EVTYPE, ignore.case = TRUE)] <- 'TYPHOON'
+StormData$event_cat[grepl('TSUNAMI',StormData$EVTYPE, ignore.case = TRUE)] <- 'TSUNAMI'
+StormData$event_cat[grepl('BURST',StormData$EVTYPE, ignore.case = TRUE)] <- 'BURST'
+StormData$event_cat[grepl('DAM',StormData$EVTYPE, ignore.case = TRUE)] <- 'DAM FAILURE'
+StormData$event_cat[grepl('RED FLAG',StormData$EVTYPE, ignore.case = TRUE)] <- 'RED FLAG'
+StormData$event_cat[grepl('SEAS|MARINE',StormData$EVTYPE, ignore.case = TRUE)] <- 'ROUGH SEAS'
+StormData$event_cat[grepl('BEACH',StormData$EVTYPE, ignore.case = TRUE)] <- 'BEACH EROSION'
+StormData$event_cat[grepl('SOUTHEAST',StormData$EVTYPE, ignore.case = TRUE)] <- 'SOUTHEAST'
+StormData$event_cat[grepl('MONTHLY TEMPERATURE',StormData$EVTYPE, ignore.case = TRUE)] <- 'TEMPERATURE'
+StormData$event_cat[grepl('STREAM',StormData$EVTYPE, ignore.case = TRUE)] <- 'STREAM'
+StormData$event_cat[grepl('STORM SURGE',StormData$EVTYPE, ignore.case = TRUE)] <- 'SURGE'
+StormData$event_cat[grepl('MILD PATTERN',StormData$EVTYPE, ignore.case = TRUE)] <- 'MILD PATTERN'
+StormData$event_cat[grepl('EXCESSIVE',StormData$EVTYPE, ignore.case = TRUE)] <- 'EXCESSIVE'
+StormData$event_cat[grepl('METRO',StormData$EVTYPE, ignore.case = TRUE)] <- 'METRO STORM'
+StormData$event_cat[grepl('SEICHE',StormData$EVTYPE, ignore.case = TRUE)] <- 'SEICHE'
+StormData$event_cat[grepl('LANDSPOUT',StormData$EVTYPE, ignore.case = TRUE)] <- 'LANDSPOUT'
+StormData$event_cat[grepl('ROGUE WAVE',StormData$EVTYPE, ignore.case = TRUE)] <- 'ROGUE WAVE'
+Here, the symbols that represent exponents are replaced with their corresponding exponents in order for the monetary value of property/crop damage to be calculated.
+
+StormData <- transform(StormData, PROPDMG =
+                               ifelse(StormData$PROPDMGEXP == "", StormData$PROPDMG*10^0,
+                                      ifelse(StormData$PROPDMGEXP == "-", StormData$PROPDMG*10^0,
+                                             ifelse(StormData$PROPDMGEXP == "?", StormData$PROPDMG*10^0,
+                                                    ifelse(StormData$PROPDMGEXP == "+", StormData$PROPDMG*10^0,
+                                                           ifelse(StormData$PROPDMGEXP == "0", StormData$PROPDMG*10^0,
+                                                                  ifelse(StormData$PROPDMGEXP == "1", StormData$PROPDMG*10^1,
+                                                                         ifelse(StormData$PROPDMGEXP == c("2", "H", "h"), StormData$PROPDMG*10^2,
+                                                                                ifelse(StormData$PROPDMGEXP == c("3", "K", 'k'), StormData$PROPDMG*10^3,
+                                                                                       ifelse(StormData$PROPDMGEXP == "4", StormData$PROPDMG*10^4,
+                                                                                              ifelse(StormData$PROPDMGEXP == "5", StormData$PROPDMG*10^5,
+                                                                                                     ifelse(StormData$PROPDMGEXP == c("6","M", "m"), StormData$PROPDMG*10^6,
+                                                                                                            ifelse(StormData$PROPDMGEXP == "7", StormData$PROPDMG*10^7,
+                                                                                                                   ifelse(StormData$PROPDMGEXP == "8", StormData$PROPDMG*10^8,
+                                                                                                                          ifelse(StormData$PROPDMGEXP == "B", StormData$PROPDMG*10^9,
+                                                                                                                                 PROPDMG)))))))))))))))
+## Warning in StormData$PROPDMGEXP == c("2", "H", "h"): longer object length is not
+## a multiple of shorter object length
+## Warning in StormData$PROPDMGEXP == c("3", "K", "k"): longer object length is not
+## a multiple of shorter object length
+## Warning in StormData$PROPDMGEXP == c("6", "M", "m"): longer object length is not
+## a multiple of shorter object length
+StormData <- transform(StormData, CROPDMG =
+                               ifelse(StormData$CROPDMGEXP == "", StormData$CROPDMG*10^0,
+                                      ifelse(StormData$CROPDMGEXP == "?", StormData$CROPDMG*10^0,
+                                             ifelse(StormData$CROPDMGEXP == "0", StormData$CROPDMG*10^0,
+                                                    ifelse(StormData$CROPDMGEXP == c("2", "H", "h"), StormData$CROPDMG*10^2,
+                                                           ifelse(StormData$CROPDMGEXP == c("3", "K", 'k'), StormData$CROPDMG*10^3,
+                                                                  ifelse(StormData$CROPDMGEXP == c("6","M", "m"), StormData$CROPDMG*10^6,
+                                                                         ifelse(StormData$PROPDMGEXP == "B", StormData$CROPDMG*10^9,
+                                                                                CROPDMG))))))))
+## Warning in StormData$CROPDMGEXP == c("2", "H", "h"): longer object length is not
+## a multiple of shorter object length
+## Warning in StormData$CROPDMGEXP == c("3", "K", "k"): longer object length is not
+## a multiple of shorter object length
+## Warning in StormData$CROPDMGEXP == c("6", "M", "m"): longer object length is not
+## a multiple of shorter object length
+Results
+Plotting Weather Fatalities/Injuries
+
+Fatalities <- aggregate(FATALITIES ~ event_cat, StormData, FUN = sum)
+Injuries <- aggregate(INJURIES ~ event_cat, StormData, FUN = sum)
+
+Fatalities <- Fatalities[order(Fatalities$FATALITIES, decreasing = TRUE), ]
+Injuries <- Injuries[order(Injuries$INJURIES, decreasing = TRUE), ]
+
+ggplot(Fatalities[1:10, ], aes(x = reorder(event_cat, FATALITIES), y = FATALITIES)) + geom_bar(stat = "identity") + ggtitle("Top 10 Deadliest Weathers by Death") + xlab("Weather Type") + ylab("Fatalities")
+
+
+ggplot(Injuries[1:10, ], aes(x = reorder(event_cat, INJURIES), y = INJURIES)) + geom_bar(stat = "identity") + ggtitle("Top 10 Deadliest Weathers by Injury") + xlab("Weather Type") + ylab("Injuries")
+ The top 10 deadliest and dangerous weathers are graphed above.
+
+Plotting Weather Property and Crop Damage
+
+EconomicDamage <- aggregate(PROPDMG + CROPDMG ~ event_cat, StormData, FUN = sum)
+
+names(EconomicDamage)[names(EconomicDamage) == "PROPDMG + CROPDMG"] <- "PropertyCropDamage"
+
+EconomicDamage <- EconomicDamage[order(EconomicDamage$PropertyCropDamage, decreasing = TRUE), ]
+
+ggplot(EconomicDamage[1:10, ], aes(x = reorder(event_cat, PropertyCropDamage), y = PropertyCropDamage)) + geom_bar(stat = "identity") + ggtitle("Top 10 Most Expensive Weathers by Property and Crop Damage") + xlab("Weather Type") + ylab("Property and Crop Damage")
+ The top 10 economically damaging weathers are graphed above.
+
+Final Analysis
+According to the plots, tornadoes are the deadliest and most dangerous, while hurricanes are the most economically damaging.
