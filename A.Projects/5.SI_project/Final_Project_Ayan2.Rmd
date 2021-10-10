@@ -1,0 +1,133 @@
+---
+title: "Final Project Part II"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+  html_notebook: default
+---
+
+
+## Part I
+
+##### Author: Davut Emrah Ayan
+
+
+Now in the second portion of the project, we're going to analyze the ToothGrowth data in the R datasets package.
+
+## 1. Load the ToothGrowth data and perform some basic exploratory data analyses
+
+```{r}
+library(datasets)
+data(ToothGrowth)
+```
+
+In the data set, there are 3 variables. len and dose are numerical, supp is factor variable with two levels.
+
+```{r}
+str(ToothGrowth)
+```
+
+
+## 2. Provide a basic summary of the data.
+
+It is good that there is no missing value in the data. Factors in supp variable is evenly distributed. Min-max, mean and summary statistics of the numerical variables are shown below.
+
+```{r}
+library(skimr)
+skim(ToothGrowth)
+```
+
+
+```{r}
+library(dplyr)
+ToothGrowth %>%
+    group_by(supp, dose) %>%
+    summarise(mean_length = mean(len),
+              .groups = "drop") 
+```
+
+
+## 3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+
+#### by supp 
+
+Here we can see the difference in means of length between OJ and VC group. 
+
+```{r}
+ToothGrowth %>%
+    group_by(supp) %>%
+    summarise(mean_length = mean(len),
+              .groups = "drop") 
+```
+
+
+I test the hypotheses of equality in means of length. I don't have information about the groups tested, whether they are the same group tested twice or randomized two independent groups. For this reason I will test with paired and unpaired twice. 
+
+Below test results assume unpaired groups and constant population variance. 
+
+T-statistics of mean equality is 1.9153, with 58 degrees of freedom. 95% confidence interval for mean difference is [-0.17  7.57]. Since CI contains 0 and p-value = 0.06, we can conclude that we can not reject the null hypotheses of means are equal at 5% significance level. 
+
+```{r}
+t.test(len ~ supp, data = ToothGrowth, paired = FALSE, var.equal = T)
+```
+
+Below test results assume paired groups and constant population variance. 
+
+T-statistics of mean equality is 3.3026, with 29 degrees of freedom. 95% confidence interval for mean difference is [1.41  5.99]. Since CI does not contain 0 and p-value = 0.003, we can conclude that we reject the null hypotheses of means are equal at 5% significance level.
+
+```{r}
+t.test(len ~ supp, data = ToothGrowth, paired = TRUE, var.equal = T)
+```
+
+#### by dose 
+
+Here we can see there is clear differences in means of length by dose. Mean length of tooth grow increase by dose.  
+```{r}
+ToothGrowth %>%
+    group_by(dose) %>%
+    summarise(meanlen = mean(len))
+```
+
+```{r}
+dose05 = ToothGrowth[ToothGrowth$dose==0.5, "len"]
+dose1 = ToothGrowth[ToothGrowth$dose==1, "len"]
+dose2 = ToothGrowth[ToothGrowth$dose==2, "len"]
+```
+
+T-test results for the equality of means of dose 0.5 and dose 1 shows below that either paired or unpaired we reject the null hypotheses at very low significance level.
+
+```{r}
+t.test(dose05, dose1, paired = T, var.equal = T)
+t.test(dose05, dose1, paired = F, var.equal = T)
+```
+
+Similarly, I can reject the null hypothesis that mean lengths are equal when dose 0.5 and 2 with very small p-values.
+```{r}
+t.test(dose05, dose2, paired = T, var.equal = T)
+t.test(dose05, dose2, paired = F, var.equal = T)
+```
+
+Finally, I can reject the equality of mean lengths when dosage are 1 and 2 at very low significance levels.
+
+```{r}
+t.test(dose1, dose2, paired = T, var.equal = T)
+t.test(dose1, dose2, paired = F, var.equal = T)
+```
+
+## 4. State your conclusions and the assumptions needed for your conclusions.
+
+I tested several hypothesis of mean equalities among groups of dose and supp.
+
+By dose levels, all three group means are found to be significantly different, when I assume paired and unpaired but equal variances for all tests.
+
+By supp, I fail to reject the mean equality when I assume unpaired (two sample test). It did not change the decision when I assume equal or unequal Variances. 
+
+But when I assumed one sample (paired), I can reject the mean equality.
+
+So, I will need more information about how data is collected to make better decisions. 
+
+
+
+
+
