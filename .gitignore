@@ -6,6 +6,8 @@
 .RData
 .gitattributes
 *.Rhistory
+*data
+
 # Example code in package build process
 *-Ex.R
 # Output files from R CMD build
