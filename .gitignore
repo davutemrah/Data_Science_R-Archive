@@ -3,10 +3,12 @@
 .Rapp.history
 # Session Data files
 *Rproj
-.RData
+*.RData
 .gitattributes
 *.Rhistory
 *data
+*.rdb
+*.zip
 
 # Example code in package build process
 *-Ex.R
