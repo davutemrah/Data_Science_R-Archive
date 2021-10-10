@@ -1,0 +1,192 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Looking at DATA
+
+```{r}
+# plants is a dataset
+class(plants)
+```
+```{r}
+# Since it is a data.frame(), it is two dimensional
+
+dim(plants)
+
+nrow(plants)
+ncol(plants)
+```
+```{r}
+# how much space it occupies
+object.size(plants)
+```
+```{r}
+# variable names
+names(plants)
+```
+```{r}
+# take a peek at the data (default is 6 rows)
+head(plants)
+```
+```{r}
+# list 10 rows
+head(plants, 10)
+```
+```{r}
+# see last 15 rows
+tail(plants, 15)
+```
+```
+NAs are the place holders for the missing values.
+```
+```{r}
+# see how the data is distributed and missing values
+summary(plants)
+
+# summary shows the basic stats for numeric variables but not for the character vectors
+```
+```{r}
+# use table to see the distribution for the character vectors
+table(plants$Active_Growth_Period)
+```
+```{r}
+# anyway best concise option to see the structure of the data or any R object and function
+str(plants)
+```
+
+# simulation
+```{r}
+# sample() generates random numbers
+
+# simulate rolling four six-sided dice 
+# with replacement: same number can show up more than once
+sample(1:6, 4, replace=TRUE)
+```
+
+```{r}
+# sample 10 numbers between 1 and 20 with replacement 
+sample(1:20, 10)
+
+# if size argument is not specified, then R assumes the same size of the source vector
+```
+```{r}
+sample(LETTERS)
+```
+
+Let the value 0 represent tails and the value 1 represent heads.
+Use sample() to draw a sample of size 100 from the vector c(0,1), with replacement. Since the coin is unfair, we must attach specific probabilities to the values 0 (tails) and 1 (heads) with a fourth argument, prob = c(0.3, 0.7). Assign the result to a new variable called flips.
+```{r}
+flips <- sample(c(0,1), 100, replace=TRUE, prob = c(0.3,0.7))
+```
+```{r}
+# count the number of 1s
+sum(flips)
+```
+```{r}
+?rbinom
+```
+A binomial random variable represents the number of 'successes' (heads) in a given number of independent 'trials' (coin flips). Therefore, we can generate a single random variable that represents the number of heads in 100 flips of our unfair coin using rbinom(1, size = 100, prob = 0.7). Note that you only specify the probability of 'success' (heads) and NOT the probability of 'failure' (tails). Try it now.
+```{r}
+rbinom(1, size = 100, prob = 0.7)
+```
+
+
+```{r}
+# if we want to see all of the 0s and 1s, we can request 100 observations, each of size 1, with success probability of 0.7.
+flips2 <- rbinom(100, size = 1, prob = 0.7)
+
+sum(flips2)
+```
+#  Normal Distribution
+```{r}
+# generate 10 random numbers from standart normal 
+rnorm(10)
+```
+
+```{r}
+rnorm(10, 100, 25)
+```
+
+# poisson
+```{r}
+#Generate 5 random values from a Poisson distribution with mean 10.
+
+rpois(5, 10)
+```
+```{r}
+# what if we want to simulate 100 *groups* of random numbers, each containing 5 values generated from a Poisson distribution with mean 10?
+
+my_pois <- replicate(100, rpois(5, 10))
+```
+replicate() created a matrix, each column of which contains 5 random numbers generated from a Poisson distribution with mean 10.
+
+```{r}
+# find the mean of each column
+cm <- colMeans(my_pois)
+```
+```{r}
+# see central limit theorem at work
+hist(cm)
+```
+## graphics
+```{r}
+data(cars)
+
+# documentation for cars
+?cars
+```
+```{r}
+plot(x=cars$speed, y=cars$dist)
+```
+```{r}
+plot(x=cars$speed, y=cars$dist, xlab = "Speed")
+```
+```{r}
+plot(x=cars$speed, y=cars$dist, xlab = "Speed", ylab = "Stopping Distance")
+```
+
+```{r}
+plot(x=cars$speed, y=cars$dist, main="My Plot")
+```
+
+```{r}
+# subtitle
+plot(cars, sub="My Plot Subtitle")
+```
+```{r}
+#color red
+plot(cars, col=2)
+```
+```{r}
+# Plot cars while limiting the x-axis to 10 through 15
+plot(cars, xlim = c(10, 15))
+```
+```{r}
+# change the shape of the symbols
+?points
+
+plot(cars, pch = 2)
+```
+
+#load mtcars
+```{r}
+data(mtcars)
+```
+```{r}
+?boxplot
+```
+```{r}
+boxplot(formula = mpg ~ cyl, data = mtcars)
+```
+
+
+
+
+
+
+
+
+
+
+

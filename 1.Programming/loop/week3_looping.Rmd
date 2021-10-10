@@ -1,0 +1,249 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# Looping in R
+
+## lappy : loop over a list and returns a list
+
+three arg: list, function, arguments
+
+if not a list, then coerced by as.list()
+```{r}
+x <- list(a = 1:5, b = rnorm(10))
+
+lapply(x, mean)
+```
+```{r}
+x <- list(a = 1:4, b = rnorm(10), c = rnorm(20,1), d = rnorm(100, 5))
+
+lapply(x, mean)
+```
+```{r}
+# runif: take a number and output number of random var from uniform
+
+x <- 1:4
+
+lapply(x, runif)
+```
+```{r}
+lapply(x, runif, min = 0, max = 10)
+```
+```{r}
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+x
+```
+```{r}
+lapply(x, function(elt) elt[, 1])
+```
+## sapply : simplify lappl
+
+if the result is a list with one element, then returns a vector
+
+if result has same length of lists then make a matrix
+
+if nothing to simplify then returns list
+```{r}
+x <- list(a = 1:4, c = rnorm(10), c = rnorm(20,1), d= rnorm(100, 5))
+
+lapply(x, mean)
+```
+```{r}
+sapply(x, mean)
+```
+```{r}
+mean(x)
+```
+## apply: 
+apply function on margin of array
+
+mostly used on rows or columns
+not faster than writing a loop, less typing
+```{r}
+str(apply)
+```
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+
+# margin: 1 means rows; 2 means columns
+
+# here collapse on rows (mean of each column)
+apply(x, 2, mean)
+```
+```{r}
+#collapse on columns (sum of each row)
+apply(x, 1, sum)
+```
+# some shortcuts (much faster)
+```{r}
+rowSums = apply(x, 1, sum)
+rowMeans = apply(x, 1, mean)
+colSums = apply(x, 2, sum)
+colMeans = apply(x, 2, mean)
+```
+
+```{r}
+rowSums(x, na.rm=F, 1)
+```
+```{r}
+apply(x, 1, sum)
+```
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+
+apply(x, 1, quantile, probs = c(0.25, 0.75))
+```
+```{r}
+# 2 x 2 x 10 dimensional 
+a <- array(rnorm(2*2*10), c(2, 2, 10))
+a
+```
+```{r}
+# collapse the third dimension (average over the third dim)
+apply(a, c(1, 2), mean)
+```
+```{r}
+# alternative
+
+rowMeans(a, dims = 2)
+```
+## mapply
+multivariate apply of sorts which applies a function in parallel
+
+multiple lists
+```{r}
+str(mapply)
+```
+```{r}
+list(rep(1, 4), rep(2, 3), rep(3, 2), rep(4, 1))
+```
+```{r}
+mapply(rep, 1:4, 4:1)
+```
+## vectorizing a function
+```{r}
+noise <- function(n, mean, sd) {
+    rnorm(n, mean, sd)
+}
+
+noise(5, 1, 2)
+```
+```{r}
+noise(1:5, 1:5, 2)
+
+# that is not what we want
+```
+## Instant vectorization
+```{r}
+mapply(noise, 1:5, 1:5, 2)
+```
+```{r}
+# Alternative
+
+list(noise(1, 1, 2), noise(2, 2, 2), noise(3, 3, 2), noise(4, 4, 2), noise(5, 5, 2))
+```
+
+## tapply: 
+apply function over subset of a vector
+```{r}
+str(tapply)
+
+# index is a factor or a list of factors 
+```
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+f
+# gl() creates factor by specifying the pattern of levels 
+```
+```{r}
+tapply(x, f, mean, simplify = FALSE)
+```
+```{r}
+tapply(x, f, range)
+```
+
+## split
+
+take a vector, list or dataframe and splits into groups by a factor or list
+```{r}
+str(split)
+
+# f is a factor
+```
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+
+f<- gl(3, 10)
+
+split(x, f)
+
+# returns a list
+```
+```{r}
+lapply(split(x, f), mean)
+```
+```{r}
+# alternative to above
+tapply(x, f, mean)
+```
+## split a dataframe
+```{r }
+library(datasets)
+
+head(airquality, 3)
+```
+# splitting by months
+```{r}
+n <- split(airquality, airquality$Month)
+n
+```
+
+
+```{r}
+lapply(n, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
+
+# missing value oldugu icin ortalamalrini alamadik
+```
+```{r}
+sapply(n, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")], na.rm=T))
+```
+# Splitting on more than one level
+```{r}
+x <- rnorm(10)
+f1 <- gl(2, 5)
+f1
+```
+
+
+```{r}
+f2 <- gl(5, 2)
+f2
+```
+```{r}
+interaction(f1, f2)
+```
+```{r}
+str(split(x, list(f1, f2)))
+```
+```{r}
+# drop empty levels
+
+str(split(x, list(f1, f2), drop = T))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

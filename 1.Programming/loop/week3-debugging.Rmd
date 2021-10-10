@@ -1,0 +1,79 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Debugging Tools - Diagnosing the Problem
+
+message: notification message, execution continue
+
+warning: not fatal but something wrong
+
+error: fatal and execution stops
+
+condition: something unexpected can occur
+```{r}
+# warning
+log(-1)
+```
+```{r}
+printmessage <- function(x) {
+    if(x>0) print("x is greater than zero")
+    else print("x is less than or equal to zero")
+    invisible(x)
+}
+
+printmessage(1)
+```
+```{r}
+printmessage(NA)
+```
+```{r}
+printmessage2 <- function(x) {
+    if(is.na(x)) print("x is missing value")
+    else
+    if(x>0) print("x is greater than zero")
+    else print("x is less than or equal to zero")
+    invisible(x)
+}
+
+x <- log(-1)
+```
+```{r}
+printmessage2(x)
+```
+# something is wrong
+user mistakes
+
+what are your expectations, can you reproduce the problem
+
+## Debugging tools
+
+traceback : prints out function call stack
+debug : flags a  function for debug mode
+browser: 
+trace
+recover
+print or cat statements
+```{r}
+mean(y)
+```
+```{r}
+traceback()
+```
+```{r}
+debug(lm)
+lm(y~x)
+
+# press n to see the next argument
+```
+
+```{r}
+options(error = recover)
+
+read.csv("nosuchfile")
+```
+
+
+
+

@@ -1,0 +1,233 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## The str Function
+* compactly display the internal structure of an R object
+* an alternative to summary
+```{r}
+# example
+str(lm)
+```
+```{r}
+str(ls)
+```
+```{r}
+# create a random number from normal distribution
+x <- rnorm(100, 2, 5)
+summary(x)
+```
+```{r}
+str(x)
+```
+```{r}
+# create a factor variable
+f <- gl(40, 4)
+summary(f)
+```
+```{r}
+str(f)
+```
+
+```{r}
+library(datasets)
+head(airquality)
+```
+```{r}
+str(airquality)
+```
+```{r}
+# create a matrix
+
+m <- matrix(rnorm(100), ncol = 10, nrow = 10)
+
+str(m)
+```
+```{r}
+m[, 1]
+```
+## Split a dataframe by factor(month here)
+```{r}
+s <- split(airquality, airquality$Month)
+
+str(s)
+```
+## Generating Random Numbers
+Functions for probability functions
+d: density
+r: random number generator
+p: cumulative distribution
+q: quantile function
+```{r}
+# generate random variables from a normal distribution
+rnorm(10, 5, 1)
+```
+```{r}
+dnorm(x, mean = 0, sd=1, log = FALSE)
+pnorm(q, mean = 0, sd=1, lower.tail = TRUE, log.p = FALSE)
+qnorm(p, mean = 0, sd=1, lower.tail = TRUE, log.p = FALSE)
+rnorm(n, mean = 0, sd=1)
+```
+pnorm(q) = f(q) ==> P(x < q)
+qnorm(p) = f'(p)
+
+q...(): probability distribution functions beginning with the `q' prefix are used to evaluate the quantile (inverse cumulative distribution) function.
+
+```{r}
+x <- rnorm(10)
+summary(x)
+```
+# pseude random
+```{r}
+# set.seed(): it ensures that the sequence of random numbers starts in a specific place and is therefore reproducible.  
+set.seed(1121)
+rnorm(5)
+```
+```{r}
+rnorm(5)
+```
+```{r}
+set.seed(1121)
+rnorm(5)
+```
+
+# poisson random variables
+```{r}
+# n, rate(mean)
+rpois(10,1)
+```
+```{r}
+ppois(2,4)   # Pr(x<=2)
+ppois(4,4)
+ppois(6,4)
+```
+# simulate a linear model
+Generate data from a linear model
+
+y = b0 + b1x + e; e~N(0, 4) and x~N(0,1), 
+b0=0.5  and b1=2
+
+```{r}
+set.seed(20)
+
+x <- rnorm(100)
+e <- rnorm(100, 0, 2)
+y <- 0.5 + 2*x + e
+summary(y)
+```
+
+```{r}
+plot(x,y)
+```
+What if x is binary?
+```{r}
+set.seed(10)
+
+x <- rbinom(100, 1, 0.5)
+e <- rnorm(100, 0, 2)
+y <- 0.5 + 2*x + e
+
+summary(y)
+```
+```{r}
+plot(x,y)
+```
+# Generating Random Numbers from a Generalized Linear Model
+
+suppose we want to simulate from a Poisson model where
+Y ~ Poisson(m)    log(m) = b0 + b1*x
+b0 = 0.5  and b1 = 0.3
+
+```{r}
+set.seed(1)
+
+x <- rnorm(100)
+log.mu <- 0.5 + 0.3*x
+
+y <- rpois(100, exp(log.mu))
+
+plot(x, y)
+```
+## Random Sampling
+```{r}
+set.seed(1)
+
+# draw 4 numbers from 1 to 10 without replacement
+sample(1:10, 4)  
+```
+```{r}
+sample(letters, 5)
+```
+```{r}
+# permutation
+sample(1:10)
+```
+```{r}
+# sample with replacement
+sample(1:10, replace = TRUE)
+```
+## Profiling
+
+We need to optimize our code when we work with large datasets and if we need to run loop for 1000 iterations. But dont forget premature optimization is the root of all evil.
+
+First collect data, dont guess.
+
+system.time() takes an argument and computes the time (in seconds) spent by the CPU to execute an expression.
+* It returns an object of class proc_time.
+* If a computer has more than one available processor and R is able to take advantage of that, then which of the following is true when using `system.time()' 
+ 
+```
+```{r}
+## Elapsed time > user time
+system.time(readLines("http://www.jhsph.edu"))
+```
+```{r}
+hilbert <- function(n) {
+    i <- 1:n
+    1/outer(i-1, i, "+")
+}
+
+x <- hilbert(1000)
+
+system.time(svd(x))
+```
+```{r}
+system.time({
+    n <- 1000
+    r <- numeric()
+    for (i in 1:n) {
+        x <- rnorm(n)
+        r[i] <- mean(x)
+    }
+})
+```
+## Rprofiler
+Rprof()
+summaryRprof()
+DO not use system.time() and Rprof() together!!!
+
+summaryRprof() summarizes the output of Rprof() and gives percent of time spent in each function (two types of normalization)
+
+It is good to break the code into functions...
+
+# Quiz
+```{r}
+set.seed(1)
+rpois(5,2)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
