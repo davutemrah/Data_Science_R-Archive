@@ -1,0 +1,185 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+```
+
+# DPLYR
+
+this package can be used on data.frame, data.tables, multidimensional arrays. 
+
+```{r}
+path2csv <- "/Library/Frameworks/R.framework/Versions/4.0/Resources/library/swirl/Courses/Getting_and_Cleaning_Data/Manipulating_Data_with_dplyr/2014-07-08.csv"
+```
+
+```{r}
+mydf <- read.csv(file = path2csv, stringsAsFactors = FALSE)
+
+dim(mydf)
+
+head(mydf)
+```
+
+```{r}
+packageVersion("dplyr")
+```
+
+```{r}
+# make a tibble data frame
+cran <- tbl_df(mydf)
+```
+
+tbl_df make more informative and compact
+dplyr just shows us the first 10 rows of data and only as many columns as fit neatly in our console. At the bottom, we see the names and classes for any variables that didn't fit on our screen.
+
+```{r}
+mydf
+```
+
+# select
+```{r}
+?select
+```
+```{r}
+select(cran, ip_id, package, country)
+```
+ The first thing to notice is that we don't have to type cran$ip_id, cran$package, and cran$country, as we normally would when referring to columns of a data frame. The select() function knows we are referring to columns of the cran dataset.
+Also, note that the columns are returned to us in the order we specified, even though ip_id is the rightmost column in the original dataset.
+
+
+```{r}
+select(cran, r_arch:country)
+```
+
+Normally, this notation is reserved for numbers, but select() allows you to specify a sequence of columns this way, which can save a bunch of typing. Use select(cran, r_arch:country) to select all columns starting from r_arch and ending with country.
+
+
+We can also select the same columns in reverse order.
+```{r}
+select(cran, country:r_arch)
+```
+
+```{r}
+select(cran, -time) # to omit the time column
+```
+
+```{r}
+-(5:20)
+```
+
+```{r}
+select(cran, -(X:size))
+```
+# filter
+
+subsetting rows
+
+```{r}
+filter(cran, package == "swirl")
+```
+
+Multiple conditions
+```{r}
+filter(cran, r_version == "3.1.1", country == "US")
+```
+
+```{r}
+?Comparison
+```
+
+```{r}
+filter(cran, country == "IN", r_version <= "3.0.2")
+```
+
+This will gives us all rows for which the country variable equals either "US" or "IN"
+```{r}
+filter(cran, country == "US" | country == "IN")
+```
+
+```{r}
+filter(cran, size > 100500, r_os == "linux-gnu")
+```
+
+```{r}
+is.na(c(3, 5, NA, 10))
+```
+
+```{r}
+!is.na(c(3, 5, NA, 10))
+```
+
+Use filter() to return all rows of cran for which r_version is NOT NA.
+
+```{r}
+filter(cran, !is.na(r_version))
+```
+
+```{r}
+cran2 <- select(cran, size:ip_id)
+```
+
+# Arrange
+order the ROWS of cran2 so that ip_id is in ascending order (from small to large)
+
+```{r}
+arrange(cran2, ip_id)
+```
+
+descending
+```{r}
+arrange(cran2, desc(ip_id))
+```
+
+sort by multiple columns
+```{r}
+arrange(cran2, package, ip_id)
+```
+
+```{r}
+arrange(cran2, country, desc(r_version), ip_id)
+```
+
+```{r}
+cran3 <- select(cran, ip_id, package, size)
+```
+
+# Mutate
+```{r}
+mutate(cran3, size_mb = size / 2^20)
+```
+
+```{r}
+mutate(cran3, size_mb = size / 2^20, size_gb = size_mb/2^10)
+```
+
+All of the values in cran3 are 1000 bytes less than they should be. Using cran3, create just one new column called correct_size that contains the correct size.
+
+```{r}
+mutate(cran3, correct_size = size + 1000)
+```
+
+# Summarize
+
+summarize(), collapses the dataset to a single row. Let's say we're interested in knowing the average download size.
+```{r}
+summarize(cran, avg_bytes = mean(size))
+```
+
+```{r}
+unique(df$VAL)
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+

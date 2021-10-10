@@ -1,0 +1,141 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# QUIZ 1
+
+```{r}
+download.file(url = "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv", destfile = "./data/df.csv")
+
+df <- read.csv("./data/df.csv")
+```
+
+# Q1 How many properties are worth $1,000,000 or more?
+```{r}
+unique(df$VAL)
+```
+
+```{r}
+df %>%
+    select(VAL) %>%
+    filter(VAL==24) %>%
+    nrow
+```
+# Question 2
+Use the data you loaded from Question 1. Consider the variable FES in the code book.
+Which of the "tidy data" principles does this variable violate? 
+```{r}
+unique(df$FES)
+```
+
+# Question 3:
+Download the Excel spreadsheet on Natural Gas Acquisition Program here:
+
+```{r}
+url2 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FDATA.gov_NGAP.xlsx "
+download.file(url =url2, destfile = "./data/df2.xlsx", method = "curl" )
+```
+Read rows 18-23 and columns 7-15 into R and assign the result to a variable called
+
+```{r}
+library(readxl)
+
+range1 <- "G18:O23"
+dat <- read_xlsx(path = "./data/df2.xlsx", range = range1)
+
+dat2 <- read_xlsx(path = "./data/df2.xlsx", 
+                  range = cell_limits(c(18, 7), c(23, 15)))
+
+sum(dat$Zip*dat$Ext, na.rm = T)
+```
+
+Read XML data
+
+How many restaurants have zipcode 21231? 
+```{r}
+library(XML)
+url3 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml" 
+
+download.file(url = url3, destfile = "./data/xml1.xml", extra = "curl")
+```
+```{r}
+doc <- xmlTreeParse("./data/xml1.xml", useInternal = TRUE)
+class(doc)
+```
+```{r}
+topnode <- xmlRoot(doc)
+class(topnode)
+```
+```{r}
+xmlName(topnode)
+```
+all nodes tagged with zipcode
+```{r}
+els <- getNodeSet(topnode, "//zipcode")
+class(els)
+```
+```{r}
+els[[1]]
+```
+
+```{r}
+# matrix
+mat <- xmlSApply(els, function(x)xmlSApply(x, xmlValue))
+```
+
+```{r}
+#transpose
+# t(mat)
+
+mat <- tibble(mat)
+mat %>% filter(mat==21231) %>% nrow
+```
+
+The American Community Survey distributes downloadable data about United States communities. Download the 2006 microdata survey about housing for the state of Idaho using download.file() from here:
+
+```{r}
+url5 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv"
+
+download.file(url = url5, destfile = "./data/q5.csv")
+```
+
+```{r}
+library(readxl)
+library(data.table)
+
+df <- read.csv(file = "./data/q5.csv")
+```
+
+FREAD: Similar to read.table but faster and more convenient. All controls such as sep, colClasses and nrows are automatically detected.
+```{r}
+dt <- fread(file = "./data/q5.csv")
+```
+
+The following are ways to calculate the average value of the variable pwgtp15 broken by sex
+```{r}
+system.time(dt[, mean(pwgtp15), by = SEX])
+```
+```{r}
+rowMeans[dt$SEX==1]
+system.time(rowMeans(dt)[dt$SEX==2])
+```
+
+
+```{r}
+tapply(dt$pwtgtp15, dt$SEX, mean)
+```
+```{r}
+system.time(mean(dt$pwgtp15, by=dt$SEX))
+```
+
+
+
+
+
+
+
+
+
+
+

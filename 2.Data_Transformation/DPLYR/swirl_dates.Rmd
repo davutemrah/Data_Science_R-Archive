@@ -1,0 +1,177 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(swirl)
+```
+
+Unfortunately, due to different date and time representations, this lesson is only guaranteed to work with an "en_US.UTF-8" locale. To
+view your locale, type Sys.getlocale("LC_TIME").
+
+```{r}
+Sys.getlocale("LC_TIME")
+```
+
+```{r}
+library(lubridate)
+
+help(package = lubridate)
+```
+
+```{r}
+this_day <- today()
+this_day
+```
+There are three components to this date. In order, they are year, month, and day. We can extract any of these components using the year(), month(), or day() function, respectively. Try any of those on this_day now.
+
+```{r}
+year(this_day)
+month(this_day)
+wday(this_day)
+wday(this_day, label = TRUE)
+```
+
+```{r}
+this_moment <- now()
+this_moment
+```
+
+```{r}
+hour(this_moment)
+minute(this_moment)
+second(this_moment)
+```
+
+## Parsing data and time
+```{r}
+my_date <- ymd("1989-05-17")
+my_date
+class(my_date)
+```
+
+
+```{r}
+ymd("1989 May 17")
+```
+
+```{r}
+mdy("March 12, 1975")
+```
+```{r}
+dmy(25081985)
+```
+
+# be careful
+```{r}
+ymd("192012")
+
+#All formats failed to parse. No formats found.
+```
+
+```{r}
+ymd("1920/1/2")
+```
+
+```{r}
+dt1 <- "2014-08-23 17:23:02"
+dt1
+```
+```{r}
+ymd_hms(dt1)
+```
+
+# only time
+```{r}
+time1 <- "03:22:14"
+
+hms(time1)
+```
+
+# parse columns of date
+```{r}
+dt2 = c("2014-05-14", "2014-09-22", "2014-07-11")
+
+ymd(dt2)
+```
+
+## UPDATING TIME
+
+The update() function allows us to update one or more components of a date-time. For example, let's say the current time is 08:34:55 (hh:mm:ss). Update this_moment to the new time using the following command: update(this_moment, hours = 8, minutes = 34, seconds = 55).
+
+```{r}
+update(this_moment, hours = 8, minutes = 34, seconds = 55)
+```
+
+Unless you're a superhero, some time has passed since you first created this_moment. Use update() to make it match the current time, specifying at least hours and minutes. Assign the result to this_moment, so that this_moment will contain the new time.
+```{r}
+this_moment
+```
+
+```{r}
+this_moment <- update(this_moment, hours=10, minutes =0 )
+this_moment
+```
+
+## Making a fake Itinary
+```{r}
+# new york
+
+nyc <- now(tz = "America/New_York")
+nyc
+```
+
+```{r}
+# two days later
+
+depart <- nyc + days(2)
+depart
+```
+So now depart contains the date of the day after tomorrow. Use update() to add the correct hours (17) and minutes (34) to depart. Reassign the result to depart.
+
+```{r}
+depart <- update(depart, hours = 17, minutes = 34 )
+depart
+```
+The first step is to add 15 hours and 50 minutes to your departure time. Recall that nyc + days(2) added two days to the current time in New York. Use the same approach to add 15 hours and 50 minutes to the date-time stored in depart. Store the result in a new variable called arrive.
+
+```{r}
+arrive <- depart + hours(15) + minutes(50)
+
+```
+
+The arrive variable contains the time that it will be in New York when you arrive in Hong Kong. What we really want to know is what time it will be in Hong Kong when you arrive, so that your friend knows when to meet you.
+
+```{r}
+?with_tz
+```
+
+Use with_tz() to convert arrive to the "Asia/Hong_Kong" time zone. Reassign the result to arrive, so that it will get the new value.
+```{r}
+arrive <- with_tz(arrive, tzone = "Asia/Hong_Kong" )
+arrive
+```
+
+Fast forward to your arrival in Hong Kong. You and your friend have just met at the airport and you realize that the last time you were together was in Singapore on June 17, 2008. Naturally, you'd like to know exactly how long it has been.
+
+```{r}
+last_time <- mdy("June 17, 2008", tz = "Singapore")
+last_time
+```
+
+# how much time has passed/?
+```{r}
+how_long <- interval(start = last_time, end = arrive)
+
+how_long
+
+as.period(how_long)
+```
+
+
+
+
+
+
+

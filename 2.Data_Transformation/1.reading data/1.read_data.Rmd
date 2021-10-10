@@ -1,0 +1,199 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Reading data : read.table()
+
+robust and consistent, but requires more parameters,
+reads data into RAM, so bigger data cause more problem
+
+#### Some important parameters
+na.strings : set the character that represent s a missing value
+nrow       : how many rows to read of the file
+skip       : number of lines to skip before to read
+
+```{r}
+str(read.table)
+```
+
+```{r}
+salarydata1 <- read.table(file = "./data/salary.csv", sep = ",",
+                          nrows = 10, header = T)
+```
+
+```{r}
+salarydata2 <- read.csv("./data/salary.csv", nrows = 10)
+```
+
+```{r}
+identical(salarydata1, salarydata2)
+```
+
+### Reading excel files
+```{r}
+if(!file.exists("rawdata")){dir.create("rawdata")}
+fileurl2 <- "https://data.baltimorecity.gov/api/views/dz54-2aru/rows.xlsx?accessType=DOWNLOAD"
+download.file(fileurl2, destfile = "./rawdata/cameras.xlsx", method = "curl")
+```
+
+library(xlsx)
+#read.xlsx() not gonna work
+this package runs with java and I dont have java on this computer
+
+```{r}
+library(readxl)
+str(read_excel)
+#read_excel(): guess if the path is xls or xlsx 
+```
+```
+read_excel()
+read_xls()
+read_xlsx()
+```
+```{r}
+library(readr)
+read_excel(path = "./rawdata/exceldata.xlsx")
+#sheet 2
+read_excel(path = "./rawdata/exceldata.xlsx", sheet=1)
+# skip 100 rows
+read_excel(path = "./rawdata/exceldata.xlsx", skip = 100)
+# default column names
+read_excel(path = "./rawdata/exceldata.xlsx", col_names = FALSE)
+# number of data rows
+read_excel(path = "./rawdata/exceldata.xlsx", n_max = 1000)
+```
+
+range = "C1:E7"
+range = "sheet1!B1D5"
+range = cell_rows(100:150)
+
+
+
+# reading XML
+reading extensible markup language
+Extracting XML is the basis for most web scraping 
+
+Tags, elements, attributes
+start tag: < section >    
+end tag:   < /section >
+<greeting> Hello, world </Greeting>
+<img src="jeff.jpg" alt="instructor"/>
+
+```{r}
+library(XML)
+
+urlxx <- "https://www.espn.com/nba/scoreboard/_/date/20210516"
+
+doc <- htmlTreeParse(urlxx, useInternal = TRUE)
+```
+
+
+```{r}
+scores <- xpathSApply(doc, "//li[@class = 'score']", xmlValue) # list item class = score
+
+teams <- xpathSApply(doc, "//li[@class = 'team-name']", xmlValue)
+
+```
+
+Read XML data
+
+How many restaurants have zipcode 21231? 
+
+```{r}
+library(XML)
+url3 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml" 
+download.file(url = url3, destfile = "./data/xml1.xml", extra = "curl")
+```
+
+```{r}
+doc <- xmlTreeParse("./data/xml1.xml", useInternal = TRUE)
+class(doc)
+```
+```{r}
+topnode <- xmlRoot(doc)
+class(topnode)
+```
+```{r}
+xmlName(topnode)
+```
+all nodes tagged with zipcode
+```{r}
+els <- getNodeSet(topnode, "//zipcode")
+
+class(els)
+```
+```{r}
+els[[1]]
+```
+
+```{r}
+# matrix
+mat <- xmlSApply(els, function(x)xmlSApply(x, xmlValue))
+mat <- tibble(mat)
+```
+
+```{r}
+mat %>%
+filter(mat==21231) %>% slice(1:3)
+```
+## Reading JSON 
+
+* Javascript Object Notation
+* Lightweight data storage
+* Common format for APIs
+* Data stored as
+    numbers
+    Strings
+    Boolean
+    Array {}
+    Objects {}
+    
+```{r}
+library(jsonlite)
+jsondata <- fromJSON("https://api.github.com/users/jtleek/repos")
+```
+
+Nested objects on JSON
+
+```{r}
+names(jsondata$owner)
+```
+
+```{r}
+jsondata$owner$login
+```
+
+# Writing data frames to JSON
+```{r}
+# pretty is for nice indentation
+myjson <- toJSON(iris, pretty = TRUE)
+```
+
+# to print out text data
+```{r}
+# cat(myjson)
+```
+
+# convert back to JSON
+```{r}
+iris2 <- fromJSON(myjson)
+head(iris2)
+```
+
+### FREAD
+```{r}
+library(data.table)
+str(fread)
+```
+
+
+
+
+
+
+
+
+
+
+

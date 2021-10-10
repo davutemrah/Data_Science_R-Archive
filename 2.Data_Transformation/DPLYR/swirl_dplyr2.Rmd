@@ -1,0 +1,131 @@
+---
+title: "Swirl_dplyr2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```
+library(swirl)
+install_from_swirl("Getting and Cleaning Data")
+swirl()
+```
+
+```{r}
+library(dplyr)
+```
+
+
+```{r}
+cran <- as_tibble(mydf)
+cran <- tbl_df(mydf)
+rm(mydf)
+```
+
+### Grouping
+
+```{r}
+by_package <- group_by(cran, package)
+
+by_package
+```
+At the top of the output above, you'll see 'Groups: package', which tells us that this tbl has been grouped by the package variable. Everything else looks the same, but now any operation we apply to the grouped data will take place on a per package basis.
+
+
+```{r}
+summarize(by_package, mean(size))
+```
+
+Instead of returning a single value, summarize() now returns the mean size for EACH package in our dataset.
+
+
+```{r}
+pack_sum <- summarize(by_package,
+                      count = n(),
+                      unique = n_distinct(ip_id),
+                      countries = n_distinct(country) ,
+                      avg_bytes = mean(size))
+```
+
+ The 'count' column, created with n(), contains the total number of rows (i.e. downloads) for each package. The 'unique' column, created with n_distinct(ip_id), gives the total number of unique downloads for each package, as measured by the number of distinct ip_id's. The 'countries' column, created with n_distinct(country), provides the number of countries in which each package was downloaded. And finally, the 'avg_bytes' column, created with mean(size), contains the mean download size (in bytes) for each package.
+ 
+
+We need to know the value of 'count' that splits the data into the top 1% and bottom 99% of packages based on total downloads. In statistics, this is called the 0.99, or 99%, sample quantile. Use quantile(pack_sum$count, probs = 0.99) to determine this number.
+```{r}
+quantile(pack_sum$count, probs = 0.99)
+```
+
+Now we can isolate only those packages which had more than 679 total downloads. Use filter() to select all rows from pack_sum for which 'count' is strictly greater (>) than 679. Store the result in a new object called top_counts.
+
+```{r}
+top_counts <- filter(pack_sum, count>679)
+top_counts
+```
+ 
+```{r}
+View(top_counts)
+```
+ 
+```{r}
+top_counts_sorted <- arrange(top_counts, -count)
+
+top_counts_sorted <- arrange(top_counts, desc(count))
+
+```
+ 
+```{r}
+View(top_counts_sorted)
+```
+
+Perhaps we're more interested in the number of *unique* downloads on this particular day. In other words, if a package is downloaded ten times in one day from the same computer, we may wish to count that as only one download. That's what the 'unique' column will tell us.
+```{r}
+quantile(pack_sum$unique, probs = 0.99)
+
+top_unique <- filter(pack_sum, unique>465)
+
+View(top_unique)
+```
+ 
+```{r}
+top_unique_sorted <- arrange(top_unique, desc(unique))
+
+View(top_unique_sorted)
+```
+
+### Chaining (Piping) 
+
+```{r}
+top_unique_sorted <-
+    pack_sum %>%
+    filter(unique > 465) %>%
+    arrange(desc(unique))
+```
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

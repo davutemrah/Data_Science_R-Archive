@@ -1,0 +1,77 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+edu <- read_excel("../data/1.education.xlsx")
+
+movies <- c("SPYDERMAN", "BATMAN", "VERTIGO", "CHINATOWN")
+```
+### lapply() function
+
+**lapply()** function is useful for performing operations on list objects and returns a list object of same length of original set. 
+
+**lappy()** returns a list of the similar length as input list object, each element of which is the result of applying FUN to the corresponding element of list. Lapply in R takes list, vector or data frame as input and gives output in list.
+
+```{r}
+args(lapply)
+```
+
+```{r}
+movies_lower <- lapply(movies, tolower) 
+str(movies_lower)
+```
+##### list to vector
+```{r}
+unlist(movies_lower)
+```
+
+### sapply() function
+
+sapply() function takes list, vector or data frame as input and gives output in vector or matrix. It is useful for operations on list objects and returns a list object of same length of original set. Sapply function in R does the same job as lapply() function but returns a vector.
+
+```{r}
+movies_up <- sapply(movies, toupper) 
+str(movies_up)
+```
+```{r}
+df <- cars
+str(df)
+```
+
+
+```{r}
+sapply(df, min)
+```
+```{r}
+sapply(df, function(x) {(min(x) + max(x))/2})
+```
+
+### tapply() function
+
+tapply() computes a measure (mean, median, min, max, etc..) or a function for each factor variable in a vector. It is a very useful function that lets you create a subset of a vector and then apply some functions to each of the subset.
+
+```{r}
+str(tapply)
+```
+
+```{r}
+df1 <- iris
+str(df1)
+```
+```{r}
+tapply(df1$Sepal.Length, df1$Species, mean)
+```
+
+edu <- 
+edu data.frame(sapply(edu, as.numeric))
+
+#3
+train <- lapply(train, as.numeric)
+train <- as.data.frame(do.call(cbind, train1))
+
+
+
+
+

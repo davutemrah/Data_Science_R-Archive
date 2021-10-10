@@ -1,0 +1,98 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+## HDF5
+
+Reading from HDF5
+
+Used for storing large data sets
+Can store a range of data types
+Heirarchical data format
+datasets multidimensional array of data elements with metadata
+
+http://www.hdfgroup.org/ 
+
+### R HDF5 package
+```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("rhdf5")
+```
+
+```{r}
+BiocManager::available()  # so much to show
+```
+
+```{r}
+library(rhdf5)
+created = h5createFile("example.h5")
+
+created
+```
+
+### Create groups
+```{r}
+created = h5createGroup("example.h5", "foo")
+created = h5createGroup("example.h5", "baa")
+created = h5createGroup("example.h5", "foo/foobaa")
+h5ls("example.h5")
+```
+### Write to groups
+```{r}
+A = matrix(1:10, nr = 5, nc = 2)
+h5write(A, "example.h5", "foo/A")
+
+B = array(seq(0.1, 2.0, by = 0.1), dim = c(5, 2, 2))
+attr(B, "scale") <- "liter"
+
+h5write(B, "example.h5", "foo/foobaa/B")
+h5ls("example.h5")
+```
+### Write a data set
+```{r}
+df = data.frame(1L:5L, seq(0,1,length.out = 5),
+                c("ab", "cde", "fghi", "a", "s"), stringsAsFactors = FALSE)
+
+h5write(df, "example.h5", "df")
+
+h5ls("example.h5")
+```
+
+### Reading Data
+```{r}
+readA = h5read("example.h5", "foo/A")
+readB = h5read("example.h5", "foo/foobaa/B")
+readf = h5read("example.h5", "df")
+
+readA
+```
+
+```{r}
+args(h5write)
+```
+
+### Writing and reading Chunks
+
+
+```{r}
+args(h5read)
+```
+```{r}
+# writing the object in a specific index location in a dataset 
+
+h5write(obj = c(12, 13, 14), file =  "example.h5",
+        name = "foo/A", index = list(1:3, 1))
+
+h5read(file = "example.h5", name = "foo/A")
+```
+
+
+
+
+
+
+
+

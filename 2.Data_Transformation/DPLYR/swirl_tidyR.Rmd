@@ -1,0 +1,285 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(readr)
+library(tidyr)
+library(dplyr)
+```
+
+```{r}
+grade = c("A", "B", "C", "D", "E")
+male = c(5, 4, 8, 4, 5)
+female = c(3, 1, 6, 5, 5)
+
+students <- cbind(grade, male, female)
+students <- as.data.frame(students)
+students
+```
+
+This dataset actually has three variables: grade, sex, and count. The first variable, grade, is already a column, so that should remain as it is. The second variable, sex, is captured by the second and third column headings. The third variable, count, is the number of students for each combination of grade and sex.
+
+### Gather columns into key-value pairs
+```{r}
+gather(data = students, key = sex, value = count, -grade )
+
+gather(students, sex, count, -grade )
+
+```
+Each row of the data now represents exactly one observation, characterized by a unique combination of the grade and sex variables. Each of our variables (grade, sex, and count) occupies exactly one column. That's tidy data!
+
+## Second Case
+The second messy data case we'll look at is when multiple variables are stored in
+one column. Type students2 to see an example of this.
+
+```{r}
+grade = c("A", "B", "C", "D", "E")
+male1 = c(7, 4, 7, 8, 8)
+female1 = c(0,0,4,2,4)
+male2 = c(5, 5, 5, 8, 1)
+female2 = c(8, 8, 6, 1, 0)
+
+students2 <- cbind(grade, male1, female1, male2, female2)
+students2 <- as.data.frame(students2)
+students2
+```
+ This dataset is similar to the first, except now there are two separate classes, 1 and 2, and we have total counts for each sex within each class. students2 suffers from the same messy data problem of having column headers that are values (male_1, female_1, etc.) and not variable names (sex, class, and count).
+ 
+ 
+Let's start by using gather() to stack the columns of students2, like we just did with students. This time, name the 'key' column sex_class and the 'value' column count. Save the result to a new variable called res. 
+```{r}
+res <- gather(data = students2,
+              key = sex_class,
+              value = count,
+              -grade)
+res
+```
+
+### Seperating variables
+
+separating one column into multiple columns.
+```{r}
+separate(data = res, 
+         col = sex_class,
+         into = c("sex", "class"))
+```
+
+### Using pipes
+```{r}
+students2 %>%
+  gather(key = sex_class, value = count, -grade) %>%
+  separate(col = sex_class, into =  c("sex", "class")) %>%
+  print
+```
+
+In students3, we have midterm and final exam grades for five students, each of whom were enrolled in exactly two of five possible classes.
+```{r}
+name = c("Sally", "Sally", "Jeff", "Jeff", "Roger", "Roger",
+         "Karen", "Karen", "Brian", "Brian")
+test = rep(c("midterm", "final"), 5)
+class1 = c("A", "C", rep("", 6), "B", "B")
+class2 = c("", "", "D", "E", "C", "A", rep("", 4))
+class3 = c("B", "C", rep("", 4), "C", "C", "", "")
+class4 = c("", "", "A", "C", "", "", "A", "A", "", "")
+class5 = c(rep("", 4), "B", "A", "", "", "A", "C")
+students3 <- as.data.frame(cbind(test, class1, class2, class3, class4, class5))
+```
+
+# Call gather() to gather the columns class1
+# through class5 into a new variable called class.
+# The 'key' should be class, and the 'value'
+# should be grade.
+#
+# tidyr makes it easy to reference multiple adjacent
+# columns with class1:class5, just like with sequences
+# of numbers.
+#
+# Since each student is only enrolled in two of
+# the five possible classes, there are lots of missing
+# values (i.e. NAs). Use the argument na.rm = TRUE
+# to omit these values from the final result.
+
+```{r}
+students3 %>%
+  gather(key = class, value = grade , class1:class5 , na.rm  = TRUE) %>%
+  print
+```
+
+ The first variable, name, is already a column and should remain as it is. The  headers of the last five columns, class1 through class5, are all different values of what should be a class variable. The values in the test column, midterm and final, should each be its own variable containing the respective grades for each student.
+```{r}
+?spread
+```
+
+```{r}
+students3 %>%
+  gather(class, grade, class1:class5, na.rm = TRUE) %>%
+  spread(test , grade) %>%
+  print
+```
+
+
+
+Lastly, we want the values in the class column to simply be 1, 2, ..., 5 and not class1, class2, ..., class5. We can use the parse_number() function from readr to accomplish this. To see how it works, try parse_number("class5").
+```{r}
+library(readr)
+
+students3 %>%
+  gather(class, grade, class1:class5, na.rm = TRUE) %>%
+  mutate(class = parse_number(class))%>%
+  spread(test, grade) %>%
+  print
+```
+
+```{r}
+id = c(168, 168, 588, 588, 710, 710, 731, 731, 908, 908)
+name = c("Brian", "Brian", "Sally", "Sally", "Jeff", "Jeff", "Roger", "Roger",
+         "Karen", "Karen" )
+sex = c("F", "F", rep("M", 4), "F", "F", "M", "M") 
+class = c(1, 5, 1, 3, 2, 4, 2, 5,3, 4)
+midterm = c("B", "A", "A", "B", "D", "A","C", "B", "C", "A" )
+final = c("B", "C", "C", "C", "E", "C", "A", "A", "C", "A")
+students4 <- as.data.frame(cbind(id, name, sex, class, midterm, final))
+```
+
+## Forth Case
+```{r}
+students4
+```
+At first glance, there doesn't seem to be much of a problem with students4. All
+columns are variables and all rows are observations. However, notice that each id, name, and sex is repeated twice, which seems quite redundant. This is a hint that our data contains multiple observational units in a single table.
+
+```{r}
+# Complete the chained command below so that we are
+# selecting the id, name, and sex column from students4
+# and storing the result in student_info.
+#
+student_info <- 
+  students4 %>%
+  select(id, name, sex) %>%
+  print
+```
+
+```{r}
+# Add a call to unique() below, which will remove
+# duplicate rows from student_info.
+#
+# Like with the call to the print() function below,
+# you can omit the parentheses after the function name.
+# This is a nice feature of %>% that applies when
+# there are no additional arguments to specify.
+#
+student_info <- students4 %>%
+  select(id, name, sex) %>%
+  unique %>%
+  print
+```
+
+```{r}
+# select() the id, class, midterm, and final columns
+# (in that order) and store the result in gradebook.
+#
+gradebook <- students4 %>%
+  select(id, class, midterm, final) %>%
+  print
+```
+
+### Fifth Case
+
+The fifth and final messy data scenario that we'll address is when a single observational unit is stored in multiple tables. It's the opposite of the fourth problem.
+
+```{r}
+name = c("Brian", "Roger", "Roger", "Karen")
+class= c(1, 2, 5, 4)
+final= c("B", "A", "A", "A")
+passed = as.data.frame(cbind(name, class, final))
+passed
+```
+
+```{r}
+name = c("Brian", "Sally", 'Sally', "Jeff", "Jeff", "Karen")
+class = c(5, 1, 3, 2, 4, 3)
+final= c("C","C","C","E","C","C")
+failed = as.data.frame(cbind(name, class, final))
+failed
+```
+
+The name of each dataset actually represents the value of a new variable that we will call 'status'. Before joining the two tables together, we'll add a new column to each containing this information so that it's not lost when we put everything together.
+
+```{r}
+passed <- 
+  passed %>%
+  mutate(status = "passed")
+```
+
+```{r}
+failed <- 
+  failed %>%
+  mutate(status = "failed")
+```
+ Now, pass as arguments the passed and failed tables (in order) to the dplyr function bind_rows(), which will join them together into a single unit. Check ?bind_rows if you need help.
+ 
+## Appending tables 
+```{r}
+  bind_rows(passed, failed)
+```
+ 
+Of course, we could arrange the rows however we wish at this point, but the important thing is that each row is an observation, each column is a variable, and the table contains a single observational unit. Thus, the data are tidy.
+
+```{r}
+# Accomplish the following three goals:
+#
+# 1. select() all columns that do NOT contain the word "total",
+# since if we have the male and female data, we can always
+# recreate the total count in a separate column, if we want it.
+# Hint: Use the contains() function, which you'll
+# find detailed in 'Special functions' section of ?select.
+#
+# 2. gather() all columns EXCEPT score_range, using
+# key = part_sex and value = count.
+#
+# 3. separate() part_sex into two separate variables (columns),
+# called "part" and "sex", respectively. You may need to check
+# the 'Examples' section of ?separate to remember how the 'into'
+# argument should be phrased.
+#
+sat %>%
+  select(-contains("total")) %>%
+  gather(key = part_sex, value = count, -score_range) %>%
+  separate(col = part_sex , into =c("part", "sex")) %>%
+  print
+```
+
+
+```{r}
+# Append two more function calls to accomplish the following:
+#
+# 1. Use group_by() (from dplyr) to group the data by part and
+# sex, in that order.
+#
+# 2. Use mutate to add two new columns, whose values will be
+# automatically computed group-by-group:
+#
+#   * total = sum(count)
+#   * prop = count / total
+#
+sat %>%
+  select(-contains("total")) %>%
+  gather(part_sex, count, -score_range) %>%
+  separate(part_sex, c("part", "sex")) %>%
+  group_by(part, sex) %>%
+  mutate(total = sum(count),
+        prop = count/total) %>%
+  print
+```
+
+
+
+
+
+
+
+
+
+

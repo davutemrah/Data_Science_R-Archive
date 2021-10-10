@@ -1,0 +1,121 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## MySQL
+
+Reading a table from a MySQL database
+```{r}
+# install.packages("RMySQL")
+library(DBI)
+library(RMySQL)
+```
+
+```{r}
+args(dbConnect)
+```
+# connecting to MySQL database
+```{r}
+ucscDb <- dbConnect(MySQL(), user = "genome",
+                    host = "genome-mysql.cse.ucsc.edu")
+
+result <- dbGetQuery(ucscDb, "show databases;")
+dbDisconnect(ucscDb)
+```
+
+```{r}
+head(result, 3)
+```
+# connecting to hg19 and listing tables
+
+```{r}
+hg19 <- dbConnect(MySQL(), user = "genome", db = "hg19",
+                  host = "genome-mysql.cse.ucsc.edu")
+
+allTables <- dbListTables(hg19)
+
+length(allTables)
+```
+```{r}
+allTables[1:5]
+```
+# Get Dimensions of a specific table
+```{r}
+# these are columns in the specific Table
+colnames <- dbListFields(hg19, "affyU133Plus2")
+
+colnames
+```
+```{r}
+nrows <- dbGetQuery(hg19, "select count(*) from affyU133Plus2")
+
+nrows
+```
+
+# Read from table
+```{r, warning=FALSE}
+affyData <- dbReadTable(hg19, "affyU133Plus2")
+
+head(affyData)
+```
+
+# Select a Specific Subset
+
+```{r, message=FALSE, warning=FALSE}
+
+# make connection and send a MySQL query
+
+query <- dbSendQuery(hg19, "select * from affyU133Plus2 where misMatches between 1 and 3")
+
+affyMis <- fetch(query); quantile(affyMis$misMatches)
+```
+```{r}
+# make another fetch and close the connection
+affyMisSmall <- fetch(query, n = 10); dbClearResult(query);
+```
+
+```{r}
+dim(affyMisSmall)
+```
+```{r}
+dbDisconnect(hg19)
+```
+
+
+#### QUIZ
+
+```{r}
+# install package sqldf
+library(sqldf)
+library(RSQLite)
+```
+
+```{r}
+# ACS data
+
+acs <- read.csv("./sample_data/getdata_data_ss06pid.csv")
+```
+
+```{r}
+# select probability weight with ages less than 50
+
+subset <- sqldf("select pwgtp1 from acs where AGEP < 50")
+```
+
+```{r}
+unique(acs$AGEP)
+```
+
+```{r}
+# equivalent code for above
+
+sqldf("select distinct AGEP  from acs")
+```
+
+
+
+
+
+
+

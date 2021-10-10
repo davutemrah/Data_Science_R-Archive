@@ -1,0 +1,121 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+fileurl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
+download.file(url = fileurl, destfile = "./data/acs2006.csv")
+```
+```{r}
+acs2006 <- read.csv("./data/acs2006.csv")
+```
+
+Apply strsplit() to split all the names of the data frame on the characters "wgtp". 
+What is the value of the 123 element of the resulting list?
+
+```{r}
+q1 <- strsplit(names(acs2006), "wgtp")
+q1[123]
+```
+
+
+```{r}
+file2 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FGDP.csv"
+download.file(url = file2, destfile = "data/gdp.csv")
+
+gdp <- read.csv("data/gdp.csv", skip = 4)
+gdp <- gdp[1:190, ]
+```
+Remove the commas from the GDP numbers in millions of dollars and average them. What is the average?
+
+```{r}
+gdp$gdp = as.numeric(gsub(x=gdp$X.4, pattern= ",",
+                          replacement="" ))
+
+mean(gdp$gdp, na.rm = T)
+```
+
+In the data set from Question 2 what is a regular expression that would allow you to count the number of countries whose name begins with "United"? Assume that the variable with the country names in it is named countryNames. How many countries begin with United? 
+
+```{r}
+names(gdp)
+grep(pattern = "^United", x = gdp$X.3 )
+```
+
+```{r}
+file3 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FGDP.csv"
+download.file(url=file3, destfile = "data/gdp.csv")
+gdp <- read.csv("data/gdp.csv", skip = 4)
+
+gdp <- 
+    gdp %>%
+    select(X, X.1, X.3, X.4) %>%
+    mutate(X.1 = as.numeric(X.1)) %>%
+    filter(!is.na(X.1)) %>%
+    rename(CountryCode = X)
+```
+
+
+```{r}
+file4 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FEDSTATS_Country.csv"
+download.file(url=file4, destfile = "data/educ.csv")
+educ <- read.csv("data/educ.csv")
+```
+Match the data based on the country shortcode. Of the countries for which the end of the fiscal year is available, how many end in June?
+```{r}
+df <- inner_join(gdp, educ, by="CountryCode")
+```
+
+
+```{r}
+df1 <-
+    df %>%
+    select( Special.Notes) %>%
+    filter(grepl(pattern = "^Fiscal ", x=df$Special.Notes))
+
+filter(df1, grepl(pattern = "June", x = Special.Notes))
+```
+You can use the quantmod (http://www.quantmod.com/) package to get historical stock prices for publicly traded companies on the NASDAQ and NYSE. Use the following code to download data on Amazon's stock price and get the times the data was sampled.
+
+```{r}
+library(quantmod)
+amzn = getSymbols("AMZN",auto.assign=FALSE)
+sampleTimes = index(amzn)
+```
+
+
+```{r}
+amzn <- as.data.frame(amzn)
+
+amzn <-
+    amzn %>%
+    mutate(date = ymd(row.names(amzn)))
+```
+```{r}
+class(amzn$date)
+```
+
+```{r}
+amzn %>%
+    mutate(year = year(date)) %>%
+    filter(year==2012) %>%
+    nrow
+```
+
+
+```{r}
+w <- wday(amzn$date)
+unique(w)
+```
+
+```{r}
+amzn %>%
+    mutate(year = year(date),
+           day = wday(date)) %>%
+    filter(year==2012, day==2) %>%
+    nrow
+```
+
+
+

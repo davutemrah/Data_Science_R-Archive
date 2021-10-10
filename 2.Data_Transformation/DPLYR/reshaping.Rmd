@@ -1,0 +1,103 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## RESHAPE
+
+```{r}
+library(reshape2)
+```
+```{r}
+head(mtcars)
+```
+# Melting DATA Frames
+
+melt(data, ..., na.rm = FALSE, value.name = "value")
+
+
+Columns (variables) selected become rows. Melt convert from WIDE to LONG 
+```{r}
+mtcars$carname <- rownames(mtcars)
+
+carMelt <- melt(mtcars, id = c("carname", "gear", "cyl"),
+                measure.vars = c("mpg", "hp"))
+
+head(carMelt, n = 3)
+```
+```{r}
+tail(carMelt, n = 3)
+```
+## Casting Data Frames
+
+dcast: summarises the data for each row of CYL and VARIABLE values
+
+```{r}
+cylData <- dcast(data = carMelt, formula = cyl ~ variable,
+                 fun.aggregate = length)
+
+# fun.aggregate: mean, length, sum
+cylData
+```
+
+```{r}
+cylData <- dcast(data =carMelt, formula = cyl ~ variable,
+                 fun.aggregate = mean)
+
+cylData
+```
+## Averaging Values
+
+```{r}
+head(InsectSprays)
+```
+
+```{r}
+tapply(InsectSprays$count, InsectSprays$spray, sum)
+```
+
+## Split
+
+```{r}
+spIns = split(InsectSprays$count, InsectSprays$spray)
+
+spIns
+```
+#  loop
+
+```{r}
+sprCount = lapply(spIns, sum)
+
+sprCount
+```
+# Combine
+
+```{r}
+unlist(sprCount)
+```
+## SAPPLY
+
+```{r}
+sapply(spIns, sum)
+```
+# PLYR - package 
+
+```{r}
+library(plyr)
+
+ddply(InsectSprays, .(spray), summarize, sum = sum(count))
+```
+```{r}
+spraySums <- ddply(InsectSprays, .(spray), summarize, sum = ave(count, FUN = sum))
+
+dim(spraySums)
+```
+```{r}
+head(spraySums)
+```
+
+
+
+
+
+

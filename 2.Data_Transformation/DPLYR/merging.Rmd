@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+```
+
+
+### MERGING
+
+```{r}
+if(!file.exists("./data")){dir.create("./data")}
+fileUrl1 <- "https://dl.dropboxusercontent.com/u/7710864/data/reviews-apr29.csv"
+fileUrl2 = "https://dl.dropboxusercontent.com/u/7710864/data/solutions-apr29.csv"
+download.file(fileUrl1, destfile = "./data/reviews.csv", method = "curl")
+download.file(fileUrl2, destfile = "./data/solutions.csv", method = "curl")
+reviews = read.csv("./data/reviews.csv")
+solutions <- read.csv("./data/solutions.csv")
+head(reviews, 2)
+```
+# ortaklari bul
+
+```{r}
+set.seed(1234)
+df1 = data.frame(id = sample(1:10), x = rnorm(10))
+df2 = data.frame(id = sample(1:10), y = rnorm(10))
+```
+
+```{r}
+intersect(names(df1), names(df2))
+```
+
+```{r}
+arrange(full_join(df1, df2), id)
+```
+
+```{r}
+set.seed(1234)
+df1 = data.frame(id1 = sample(1:10), x = rnorm(10))
+df2 = data.frame(id2 = sample(1:10), y = rnorm(10))
+merge(df1, df2, by.x = "id1", by.y = "id2",all = TRUE)
+```
+
+# multiple data frames
+
+merge by common columns
+
+```{r}
+df1 = data.frame(id = sample(1:10), x = rnorm(10))
+df2 = data.frame(id = sample(1:10), y = rnorm(10))
+df3 = data.frame(id = sample(1:10), z = rnorm(10))
+
+dflist = list(df1, df2, df3)
+full_join(dflist)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

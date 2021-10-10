@@ -1,0 +1,306 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_notebook: default
+  pdf_document: default
+---
+
+# dplyr Library
+
+* Data frames a key here
+* one observation per row
+* optimized version of PLYR
+* fast because it is coded in C++
+* result is a data frame
+
+Basic Verbs:
+* select:  subset columns
+* filter:  subset rows
+* arrange: reorder (sort) rows
+* rename : rename col names
+* mutate : 
+* summarise
+* transmutate
+
+```{r, message=FALSE}
+library(dplyr)
+
+options(width = 105)
+rm(list = ls())
+```
+
+```{r}
+data <- file.path("data/restaurants.csv")
+df <- read.csv(data)
+```
+# col names
+```{r}
+names(df)
+```
+# subset by row and column index
+```{r}
+df[1:3, 1:4]
+```
+# Selecting columns
+```{r}
+head(select(df, X:gis_id), n=3)
+```
+# Excluding columns
+```{r}
+head(select(df, -(srcid_t:url)), n = 3)
+```
+# some more coding to do same
+```{r}
+i <- match("srcid_t", names(df))
+j <- match("url", names(df))
+
+head(df[, -(i:j)], n=3)
+```
+# Shape of data
+```{r}
+dim(df)
+```
+
+
+
+## Rows
+
+### filter()
+select subset of rows
+```{r}
+df %>% 
+  select(state, zipcode, cncldst, plcdst_no) %>%
+  filter(state == "MD", cncldst > 5) %>%
+  slice(1:3)
+```
+```{r}
+# base R code
+
+df[df$state == "MD" & df$cncldst > 5, c(16:17, 23, 25)]
+```
+### filter
+subset the rows using expression
+== | > | >=
+&, |, !, xor()
+is.na()
+between(), near()
+```{r}
+df %>% 
+  filter(`COUNTY` == "DOUGLAS" & GENDER == "MALE") %>% slice(1:3)
+```
+
+```{r}
+df %>% 
+  filter(`COUNTY` == "DOUGLAS" & between(AGE, 50, 60)) %>% slice(1:3)
+```
+```{r}
+df %>% filter( AGE > mean(AGE, na.rm = TRUE)) %>% slice(1:3)
+```
+```{r}
+vars <- c("AGE", "COUNTY CODE")
+cond <- c(50, 35)
+
+df %>%
+  filter(
+    .data[[vars[[1]]]] > cond[[1]],
+    .data[[vars[[2]]]] > cond[[2]]
+  ) %>%
+  slice(1:3)
+```
+
+### arrange()
+# ascending
+reorder rows (sort)
+```{r}
+df %>%
+  arrange(zipcode, cncldst) %>%
+  slice(1:3)
+```
+# descending
+```{r}
+df %>%
+  arrange(desc(cncldst)) %>%
+  slice(1:3)
+```
+# rename column name
+```{r}
+  df %>% rename(state_abbr = state, contact_name = cntct_nme) %>%
+  select(state_abbr, contact_name) %>%
+  slice(1:3)
+```
+
+### mutate : add new columns
+
+```{r}
+df %>%
+  mutate(deneme = X + Y) %>%
+  select(deneme, X, Y, everything()) %>%
+  slice(1:3)
+
+# mutate function string column nameleri kabul etmez
+```
+```{r}
+# Add a new vector
+df %>% 
+  mutate(Y + 20000) %>% 
+  select("Y + 20000") %>% 
+  slice(1:3)
+```
+```{r}
+# add a new vector by mutate()
+num <- seq(1, nrow(df))
+
+df %>% 
+  mutate(newvar = num) %>% 
+  select(newvar) %>%
+  slice(1:3)
+```
+
+```{r}
+dfcat <-
+df %>%
+  mutate(hotcat = factor(1 * (cncldst > 5), labels = c("cold", "hot"))) %>%
+  select(hotcat, cncldst, zipcode, state)
+head(dfcat, n=3)
+```
+
+
+### group_by()
+```{r}
+hotcold <- group_by(dfcat, xbin = cut(cncldst, 4))
+head(hotcold, n= 3)
+```
+```{r}
+hot <- group_by(dfcat, hotcat)
+head(hot)
+```
+
+```{r}
+summarise(hot, mean = mean(cncldst), max = max(zipcode))
+```
+```{r}
+df %>%
+  transmute(year = as.POSIXct(edit_date)) 
+```
+
+
+
+```{r}
+# creating a new variable based on the group
+df %>%
+  group_by(COUNTY) %>%
+  mutate(female = recode(GENDER, "FEMALE" = 1, "MALE" = 0)) %>% 
+  mutate(male = recode(GENDER, "MALE" = 1, "FEMALE" = 0)) %>%
+  slice(1:1)
+```
+
+
+
+
+### relocate()
+Change column order
+```{r}
+df %>%
+  relocate (AGE : GENDER, .before = `STATE CODE`) %>%
+  slice(1:3)
+```
+
+### slice()
+choose rows using their positions
+```{r}
+df %>% slice(2:4)
+```
+```{r}
+df %>% slice_head(n = 3)
+```
+```{r}
+# proportion
+df %>% slice_tail(prop = 0.0005)
+```
+```{r}
+df %>% slice_sample(n=4)
+```
+```{r}
+# bootstrap sample (if neede, use weight)
+
+df %>% slice_sample(prop = 0.0005, replace = TRUE)
+```
+```{r}
+# slice_min()  and  slice_max()
+
+df %>%
+  filter(!is.na(AGE))  %>%
+  slice_max(AGE, n = 3)
+```
+
+### Select columns
+```{r}
+df %>%
+  select(`GENDER CODE`, `RACE CODE`, `EDUCATION CODE`) %>% 
+  slice(1:3)
+```
+```{r}
+df %>%
+  select(`GENDER CODE` : `RACE CODE`) %>% slice(1:3)
+```
+```{r}
+df %>% select(!(`GENDER CODE` : `RACE CODE`)) %>% slice(1:3)
+```
+```{r}
+df %>% select(ends_with("CODE")) %>% slice(1:3)
+
+# df %>% select(starts_with("abc"))
+
+# df %>% select(contains("abc"))
+
+# df %>% select(matches("abc"))
+```
+```{r}
+vars <- c("GENDER", "STATE CODE")
+
+select(df, all_of(vars), "EDUCATION")
+
+# select function, string ifadeleri kabul ediyor
+```
+
+
+
+
+
+
+### Careful when grouped
+
+when grouped, other functions behave and operate within groups
+
+even slice
+```{r}
+df %>% 
+  group_by(RACE) %>%
+  filter(`COUNTY` == "DOUGLAS" & GENDER == "MALE") %>%
+  slice(1:1)
+```
+
+### summarise
+collapse data
+```{r}
+df %>%
+  summarise(mean_age = mean(AGE, na.rm = TRUE))
+```
+
+
+
+### transmute
+transmute to keep only new variables
+```{r}
+df %>%
+  transmute(zip =  mean(cncldst)) %>%
+  slice(1:3)
+```
+
+
+df %>%
+  mutate(dummy = 1) %>%
+  spread(key = gender, value = dummy, fill = 0) %>%
+  slice(1:5)
+
